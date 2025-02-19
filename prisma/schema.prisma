@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  fullName String
+  email    String   @unique
+  image    String
+  resume   Resume[]
+}
+
+model Resume {
+  id      String    @id @default(uuid())
+  content Content[]
+  userId  String
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Content {
+  id        String       @id @default(uuid())
+  resume    Resume       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId  String
+  name      String
+  title     String
+  contact   Contact[]
+  summary   String
+  experince Experience[]
+  education Education[]
+  skills    String[]
+  projects  Projects[]
+}
+
+model Contact {
+  id        String  @id @default(uuid())
+  content   Content @relation(fields: [contentId], references: [id])
+  contentId String
+  email     String
+  phone     String
+  linkedin  String  @default("")
+  github    String  @default("")
+}
+
+model Experience {
+  id          String   @id @default(uuid())
+  Content     Content  @relation(fields: [contentId], references: [id])
+  contentId   String
+  company     String
+  position    String
+  duration    String
+  description String[]
+}
+
+model Education {
+  id        String  @id @default(uuid())
+  Content   Content @relation(fields: [contentId], references: [id])
+  contentId String
+  school    String
+  degree    String
+  duration  String
+}
+
+model Projects {
+  id          String   @id @default(uuid())
+  Content     Content  @relation(fields: [contentId], references: [id])
+  contentId   String
+  name        String
+  description String
+  tech        String[]
+}
