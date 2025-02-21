@@ -5,8 +5,6 @@ import { config } from "dotenv";
 config();
 
 export async function aiResponse(formData: any) {
-  console.log("Received formData:", formData);
-
   const AI_PROMPT = `Given the following unstructured user input, correct any typos, grammatical errors, and inconsistencies while ensuring the data adheres to the structured format below. 
 
   **Instructions:**
@@ -28,7 +26,7 @@ export async function aiResponse(formData: any) {
 
 
   try {
-    const genAI = new GoogleGenerativeAI("AIzaSyDa648Nl7O4avmVcy3OLFJzp0_b3ocfrLk");
+    const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 

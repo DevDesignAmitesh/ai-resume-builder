@@ -6,7 +6,6 @@ import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
 export async function createResume(data: FormData) {
-  console.log(data)
   const session = await getServerSession(auth);
 
   if (!session || !session.user?.email) {

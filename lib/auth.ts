@@ -65,7 +65,6 @@ export const auth: AuthOptions = {
       );
 
       if (!isAllowed) {
-        console.log(`Rate limit exceeded for user ${user.email}`);
         return false; // Reject sign-in
       }
 

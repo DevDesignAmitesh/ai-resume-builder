@@ -15,12 +15,12 @@ const page = async ({
   if (!session || !session.user?.email) {
     redirect("/")
   }
-
+  
   const { resumeId } = await params;
   const res = await getResume(resumeId)
-
+  
   return (
-    <Resume resume={res.resume} resumeId={resumeId} isEditing={false} />
+    <Resume resume={res.resume} resumeId={resumeId} isEditing={true} />
   )
 }
 

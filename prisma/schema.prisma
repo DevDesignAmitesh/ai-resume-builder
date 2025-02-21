@@ -8,11 +8,20 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  fullName String
-  email    String   @unique
-  image    String
-  resume   Resume[]
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String   @unique
+  image     String
+  resume    Resume[]
+  Order     Order[]
+  isPremium Boolean  @default(false)
+}
+
+model Order {
+  id         String @id @default(uuid())
+  userId     String
+  purchaseId String
+  user       User   @relation(fields: [userId], references: [id])
 }
 
 model Resume {
@@ -38,7 +47,7 @@ model Content {
 
 model Contact {
   id        String  @id @default(uuid())
-  content   Content @relation(fields: [contentId], references: [id])
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
   contentId String
   email     String
   phone     String
@@ -48,7 +57,7 @@ model Contact {
 
 model Experience {
   id          String   @id @default(uuid())
-  Content     Content  @relation(fields: [contentId], references: [id])
+  Content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
   contentId   String
   company     String
   position    String
@@ -58,7 +67,7 @@ model Experience {
 
 model Education {
   id        String  @id @default(uuid())
-  Content   Content @relation(fields: [contentId], references: [id])
+  Content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
   contentId String
   school    String
   degree    String
@@ -67,7 +76,7 @@ model Education {
 
 model Projects {
   id          String   @id @default(uuid())
-  Content     Content  @relation(fields: [contentId], references: [id])
+  Content     Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
   contentId   String
   name        String
   description String

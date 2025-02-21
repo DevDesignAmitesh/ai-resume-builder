@@ -73,9 +73,11 @@
 @media print {
   .no-print {
     display: none;
+    width: 0;
   }
 
   .print {
     display: block;
+    width: 100%;
   }
 }

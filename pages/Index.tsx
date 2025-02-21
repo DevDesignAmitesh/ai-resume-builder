@@ -15,10 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { User, Briefcase, GraduationCap, List, Phone, Mail, FileText, Linkedin, Github } from "lucide-react";
+import { User, Briefcase, GraduationCap, List, Phone, FileText, Linkedin, Github } from "lucide-react";
 import { createResume } from "@/app/api/actions/createResume";
 import { useRouter } from "next/navigation";
 import { aiResponse } from "@/lib/ai";
+import { canCreateResume } from "@/app/api/actions/resumeLength";
 
 interface Experience {
   company: string;
@@ -66,33 +67,34 @@ const Index = () => {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     content: {
-      name: "",
+      name: "Amitesh Singh",
       title: "",
       contact: {
-        email: "",
-        phone: "",
-        linkedin: "",
-        github: "",
+        email: "amitesh@gmail.com",
+        phone: "9999999999",
+        linkedin: "linkedin.com/amitesh",
+        github: "github.com/amitesh",
       },
       summary: "",
       experience: [{
-        company: "",
+        company: "example comp.",
         position: "",
-        duration: "",
-        description: [""]
+        duration: "2023-2023",
+        description: ["handling the frontend", "and the backend of the comp"]
       }],
       education: [{
-        school: "",
-        degree: "",
-        duration: ""
+        school: "delhi univrsity sol",
+        degree: "bcom",
+        duration: "2023-2026"
       }],
-      skills: [""],
+      skills: ["nextjs", "react", "mongodb", "next-auth", "prisma", "postgrss", "websoksct", "rdis"],
       projects: [{
-        name: "",
-        description: "",
-        tech: [""]
+        name: "chat-app",
+        description: "realtime chatapp in which the user can chat and be frineds and createe grp",
+        tech: ["nextjs", "next-auth", "prisma", "postgrss", "websoksct", "rdis"]
       }]
     }
   });
@@ -195,30 +197,47 @@ const Index = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(step)) return;
-
+    setLoading(true)
     toast({
       title: "Processing your resume",
       description: "We're generating your professional resume...",
     });
 
+    const canCreate = await canCreateResume(); // Use updated function
+
+    if (!canCreate) {
+      toast({
+        title: "Free Limit Reached",
+        description: "Get Our Premium To Generate More",
+      });
+      setLoading(false)
+      return; // Stop execution if the limit is reached
+    }
+
     let aiRes;
+
     try {
       aiRes = await aiResponse(formData)
     } catch (error) {
-      console.log(error)
+      setLoading(false)
+      return;
     }
     const res = await createResume(aiRes)
+
     if (res.message === "resume created successfully") {
       toast({
         title: "Resume processed",
         description: "Redirecting, to the preview page",
       });
+      setLoading(false)
       router.push(`/preview/${res.resume?.id}`)
     } else {
       toast({
         title: "Something went wrong",
         description: "Some error occured while creating resume",
       });
+      setLoading(false)
+      return;
     }
   };
 
@@ -528,9 +547,10 @@ const Index = () => {
                 Back
               </Button>
               <Button
+                disabled={loading}
                 onClick={step === 6 ? handleSubmit : handleNext}
               >
-                {step === 6 ? "Generate Resume" : "Next"}
+                {step === 6 ? loading ? "Generating" : "Generate Resume" : "Next"}
               </Button>
             </div>
           </CardContent>
