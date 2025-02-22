@@ -32,17 +32,22 @@ model Resume {
 }
 
 model Content {
-  id        String       @id @default(uuid())
-  resume    Resume       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  resumeId  String
-  name      String
-  title     String
-  contact   Contact[]
-  summary   String
-  experince Experience[]
-  education Education[]
-  skills    String[]
-  projects  Projects[]
+  id         String       @id @default(uuid())
+  resume     Resume       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId   String
+  name       String
+  title      String
+  contact    Contact[]
+  summary    String
+  experince  Experience[]
+  education  Education[]
+  projects   Projects[]
+  feSkills   String[]
+  beSkills   String[]
+  db         String[]
+  apiDev     String[]
+  versionCon String[]
+  lang       String[]
 }
 
 model Contact {
@@ -80,5 +85,6 @@ model Projects {
   contentId   String
   name        String
   description String
+  liveLink    String   @default("")
   tech        String[]
 }

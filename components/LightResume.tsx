@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 import { useState } from "react";
 
 interface Resume {
@@ -11,7 +12,16 @@ interface Resume {
     name: string;
     title: string;
     summary: string;
-    skills: string[];
+    feSkills: string[];
+    beSkills: string[];
+    db: string[];
+    lang: string[];
+    apiDev: string[];
+    versionCon: string[];
+    skills: {
+      category: string;
+      items: string[];
+    }[]; // Modified skills structure
     contact: {
       email: string;
       phone: string;
@@ -33,6 +43,7 @@ interface Resume {
       name: string;
       description: string;
       tech: string[];
+      liveLink: string;
     }[];
   }[];
 }
@@ -42,19 +53,44 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
 
   if (!data) return <p className="text-center text-muted-foreground">No resume data available</p>;
 
-  // State for all editable fields
+  // Initialize formData with the modified skills structure
   const [formData, setFormData] = useState({
     name: data.name || "John Doe",
     title: data.title || "Full Stack Developer",
     summary: data.summary || "",
-    skills: data.skills || [],
-    contact: data.contact || { email: "", phone: "", linkedin: "", github: "" },
+    skills: [ // Default skills data in the desired structure
+      {
+        category: "Programming Languages",
+        items: data.lang ?? [],
+      },
+      {
+        category: "Frontend Skills",
+        items: data.feSkills ?? [],
+      },
+      {
+        category: "Backend Skills",
+        items: data.beSkills ?? [],
+      },
+      {
+        category: "Database",
+        items: data.db ?? [],
+      },
+      {
+        category: "Api Development",
+        items: data.apiDev ?? [],
+      },
+      {
+        category: "Version Control",
+        items: data.versionCon ?? [],
+      }
+    ],
+    contact: data.contact || [{ email: "", phone: "", linkedin: "", github: "" }],
     experince: data.experince || [],
     education: data.education || [],
     projects: data.projects || [],
   });
 
-  const handleInputChange = (field: string, value: string, index?: number, subField?: string) => {
+  const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
     setFormData((prev: any) => {
       if (index !== undefined && subField) {
         const updatedArray = [...prev[field as keyof typeof prev]];
@@ -62,12 +98,13 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
         return { ...prev, [field]: updatedArray };
       }
       if (field === "contact") {
-        return { ...prev, contact: { ...prev.contact, [subField!]: value } };
+        return { ...prev, contact: [{ ...prev.contact[0], [subField!]: value }] }; // Ensure contact is always an array of one object
       }
       return { ...prev, [field]: value };
     });
     setData(formData)
   };
+
 
   return (
     <div className="w-full mx-auto bg-white text-black p-8 rounded-xl space-y-6">
@@ -92,32 +129,32 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
           <h2 className="text-xl text-gray-600">{formData.title}</h2>
         )}
 
-        {formData.contact && (
+        {formData.contact && formData.contact.length > 0 && (
           <div className="flex justify-center w-full items-center gap-4 text-sm text-gray-700">
             {isEditing ? (
               <>
                 <input
                   className="text-sm w-full text-gray-700"
                   value={formData.contact[0].email}
-                  onChange={(e) => handleInputChange("contact", e.target.value, 0, "email")}
+                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "email")}
                   placeholder="Email"
                 />
                 <input
                   className="text-sm w-full text-gray-700"
                   value={formData.contact[0].phone}
-                  onChange={(e) => handleInputChange("contact", e.target.value, 0, "phone")}
+                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "phone")}
                   placeholder="Phone"
                 />
                 <input
-                  className="text-sm w-full text-gray-700"
+                  className="text-sm w-full underline text-gray-700"
                   value={formData.contact[0].linkedin}
-                  onChange={(e) => handleInputChange("contact", e.target.value, 0, "linkedin")}
+                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "linkedin")}
                   placeholder="LinkedIn URL"
                 />
                 <input
-                  className="text-sm w-full text-gray-700"
+                  className="text-sm w-full underline text-gray-700"
                   value={formData.contact[0].github}
-                  onChange={(e) => handleInputChange("contact", e.target.value, 0, "github")}
+                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "github")}
                   placeholder="GitHub URL"
                 />
               </>
@@ -168,18 +205,39 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
           <section className="space-y-4">
             <h3 className="text-xl font-semibold">Skills</h3>
             {isEditing ? (
-              <input
-                className="text-sm w-full"
-                value={formData.skills.join(", ")}
-                onChange={(e: any) => handleInputChange("skills", e.target.value.split(", "))}
-                placeholder="Skills (comma-separated)"
-              />
+              <div>
+                {formData.skills.map((skillCategory, index) => (
+                  <div key={index} className="mb-4">
+                    <label className="block text-sm font-bold mb-2">{skillCategory.category}</label>
+                    <input
+                      type="text"
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      value={skillCategory.items.join(', ')}
+                      onChange={(e) => {
+                        const updatedSkills = [...formData.skills];
+                        updatedSkills[index].items = e.target.value.split(',').map(item => item.trim());
+                        handleInputChange("skills", updatedSkills);
+                      }}
+                      placeholder={`Skills for ${skillCategory.category} (comma-separated)`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+
             ) : (
-              <div className="flex flex-wrap gap-2">
-                {formData.skills.map((skill, index) => (
-                  <Badge key={index} variant="secondary" className="text-sm">
-                    {skill}
-                  </Badge>
+              <div className="space-y-3">
+                {formData.skills.map((skillCategory, index) => (
+                  <div key={index} className="space-y-2">
+                    <h4 className="font-semibold">{skillCategory.category}</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {skillCategory?.items?.map((skill, skillIndex) => (
+                        <Badge key={skillIndex} variant="secondary" className="text-sm">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -277,6 +335,16 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                   />
                 ) : (
                   <p className="text-gray-700">{project.description}</p>
+                )}
+                {isEditing ? (
+                  <input
+                    className="font-medium text-gray-900 w-full"
+                    value={project.liveLink}
+                    onChange={(e) => handleInputChange("projects", e.target.value, index, "liveLink")}
+                    placeholder="Project's Live Link"
+                  />
+                ) : (
+                  <Link href={project.liveLink} target="_blank" className="font-medium text-gray-900">Live Demo: <span className="underline">{project.name}</span></Link>
                 )}
                 {project.tech && project.tech.length > 0 && (
                   isEditing ? (

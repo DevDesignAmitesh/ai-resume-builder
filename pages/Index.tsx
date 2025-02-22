@@ -38,6 +38,7 @@ interface Project {
   name: string;
   description: string;
   tech: string[];
+  liveLink: string;
 }
 
 interface Contact {
@@ -54,8 +55,14 @@ interface Content {
   summary: string;
   experience: Experience[];
   education: Education[];
-  skills: string[];
+  feSkills: string[];
+  beSkills: string[];
+  db: string[];
+  lang: string[];
+  apiDev: string[];
+  versionCon: string[];
   projects: Project[];
+  jobPostDetails: string;
 }
 
 export interface FormData {
@@ -70,32 +77,39 @@ const Index = () => {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     content: {
-      name: "Amitesh Singh",
+      name: "",
       title: "",
       contact: {
-        email: "amitesh@gmail.com",
-        phone: "9999999999",
-        linkedin: "linkedin.com/amitesh",
-        github: "github.com/amitesh",
+        email: "",
+        phone: "",
+        linkedin: "",
+        github: "",
       },
       summary: "",
       experience: [{
-        company: "example comp.",
+        company: "",
         position: "",
-        duration: "2023-2023",
-        description: ["handling the frontend", "and the backend of the comp"]
+        duration: "",
+        description: []
       }],
       education: [{
-        school: "delhi univrsity sol",
-        degree: "bcom",
-        duration: "2023-2026"
+        school: "",
+        degree: "",
+        duration: ""
       }],
-      skills: ["nextjs", "react", "mongodb", "next-auth", "prisma", "postgrss", "websoksct", "rdis"],
+      feSkills: [],
+      beSkills: [],
+      db: [],
+      apiDev: [],
+      lang: [],
+      versionCon: [],
       projects: [{
-        name: "chat-app",
-        description: "realtime chatapp in which the user can chat and be frineds and createe grp",
-        tech: ["nextjs", "next-auth", "prisma", "postgrss", "websoksct", "rdis"]
-      }]
+        name: "",
+        description: "",
+        tech: [],
+        liveLink: ""
+      }],
+      jobPostDetails: ""
     }
   });
 
@@ -145,7 +159,7 @@ const Index = () => {
           return false;
         }
         break;
-      case 3:
+      case 4:
         if (!formData.content.summary || !formData.content.title) {
           toast({
             title: "Required Fields Missing",
@@ -155,21 +169,11 @@ const Index = () => {
           return false;
         }
         break;
-      case 4:
+      case 5:
         if (!formData.content.education[0].school || !formData.content.education[0].degree) {
           toast({
             title: "Required Fields Missing",
             description: "Please provide your educational background.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        break;
-      case 6:
-        if (formData.content.skills.length === 0 || !formData.content.projects[0].name) {
-          toast({
-            title: "Required Fields Missing",
-            description: "Please add your skills and at least one project.",
             variant: "destructive",
           });
           return false;
@@ -182,16 +186,16 @@ const Index = () => {
   const handleNext = () => {
     if (!validateStep(step)) return;
 
-    if (step < 7) {
+    if (step < 7) { // Update from 6 to 7
       setStep(step + 1);
-      setProgress((step / 6) * 100);
+      setProgress((step / 7) * 100); // Update from 6 to 7
     }
   };
 
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
-      setProgress(((step - 2) / 6) * 100);
+      setProgress(((step - 2) / 7) * 100); // Update from 6 to 7
     }
   };
 
@@ -309,6 +313,21 @@ const Index = () => {
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
+              <Label htmlFor="jobPostDetails">Job Post Details</Label>
+              <Textarea
+                id="jobPostDetails"
+                placeholder="Paste the job post details here (optional)"
+                className="h-32"
+                value={formData.content.jobPostDetails}
+                onChange={(e) => updateFormData("jobPostDetails", e.target.value)}
+              />
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="space-y-2">
               <Label htmlFor="title">Professional Title</Label>
               <Input
                 id="title"
@@ -329,7 +348,7 @@ const Index = () => {
             </div>
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
@@ -378,7 +397,7 @@ const Index = () => {
             </div>
           </div>
         );
-      case 5:
+      case 6:
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
@@ -436,17 +455,67 @@ const Index = () => {
             </div>
           </div>
         );
-      case 6:
+      case 7:
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
-              <Label htmlFor="skills">Skills</Label>
-              <Textarea
-                id="skills"
-                placeholder="Enter your skills (one per line)"
-                className="h-32"
-                value={formData.content.skills.join("\n")}
-                onChange={(e) => updateFormData("skills", e.target.value.split("\n"))}
+              <Label htmlFor="lang">Programming Languages</Label>
+              <Input
+                id="lang"
+                placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
+
+                value={formData.content.lang.join(",")}
+                onChange={(e) => updateFormData("lang", e.target.value.split(","))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="feSkills">Frontend Skills</Label>
+              <Input
+                id="feSkills"
+                placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
+
+                value={formData.content.feSkills.join(",")}
+                onChange={(e) => updateFormData("feSkills", e.target.value.split(","))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="beSkills">Backend Skills</Label>
+              <Input
+                id="beSkills"
+                placeholder="Nodejs, Express.js, JWT, OAuth, NextAuth..."
+
+                value={formData.content.beSkills.join("\n")}
+                onChange={(e) => updateFormData("beSkills", e.target.value.split("\n"))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="db">Database</Label>
+              <Input
+                id="db"
+                placeholder="PostgreSQL, MongoDB, Redis...."
+
+                value={formData.content.db.join(",")}
+                onChange={(e) => updateFormData("db", e.target.value.split(","))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="apiDev">Api Development</Label>
+              <Input
+                id="apiDev"
+                placeholder="RESTful APIs, WebSockets..."
+
+                value={formData.content.apiDev.join(",")}
+                onChange={(e) => updateFormData("apiDev", e.target.value.split(","))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="versionCon">Version Control</Label>
+              <Input
+                id="versionCon"
+                placeholder="git, github, monorepos(turborepo)..."
+
+                value={formData.content.versionCon.join(",")}
+                onChange={(e) => updateFormData("versionCon", e.target.value.split(","))}
               />
             </div>
             <div className="space-y-2">
@@ -477,6 +546,15 @@ const Index = () => {
                     onChange={(e) => {
                       const newProjects = [...formData.content.projects];
                       newProjects[index].tech = e.target.value.split(", ").map(t => t.trim());
+                      updateFormData("projects", newProjects);
+                    }}
+                  />
+                  <Input
+                    placeholder="Project's live link"
+                    value={project.liveLink}
+                    onChange={(e) => {
+                      const newProjects = [...formData.content.projects];
+                      newProjects[index].liveLink = e.target.value;
                       updateFormData("projects", newProjects);
                     }}
                   />
@@ -534,6 +612,9 @@ const Index = () => {
               <div className={`flex items-center ${step === 6 ? "text-primary" : "text-muted-foreground"}`}>
                 <List size={20} />
               </div>
+              <div className={`flex items-center ${step === 7 ? "text-primary" : "text-muted-foreground"}`}>
+                <FileText size={20} /> {/* New icon for job post details */}
+              </div>
             </div>
 
             {renderStep()}
@@ -548,9 +629,9 @@ const Index = () => {
               </Button>
               <Button
                 disabled={loading}
-                onClick={step === 6 ? handleSubmit : handleNext}
+                onClick={step === 7 ? handleSubmit : handleNext}
               >
-                {step === 6 ? loading ? "Generating" : "Generate Resume" : "Next"}
+                {step === 7 ? loading ? "Generating" : "Generate Resume" : "Next"}
               </Button>
             </div>
           </CardContent>

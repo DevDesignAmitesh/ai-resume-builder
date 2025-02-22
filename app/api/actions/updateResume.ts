@@ -54,7 +54,11 @@ export async function updateResume(resumeId: string, updatedData: any) {
               name: updatedData.name || resume.content[0].name,
               title: updatedData.title || resume.content[0].title,
               summary: updatedData.summary || resume.content[0].summary,
-              skills: updatedData.skills || resume.content[0].skills,
+              feSkills: updatedData.skills || resume.content[0].feSkills,
+              beSkills: updatedData.skills || resume.content[0].beSkills,
+              db: updatedData.skills || resume.content[0].db,
+              versionCon: updatedData.skills || resume.content[0].versionCon,
+              lang: updatedData.skills || resume.content[0].lang,
               contact: updatedData.contact
                 ? {
                   updateMany: updatedData.contact.map((contact: any) => ({

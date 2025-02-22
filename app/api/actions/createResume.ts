@@ -6,6 +6,7 @@ import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
 export async function createResume(data: FormData) {
+  console.log(data)
   const session = await getServerSession(auth);
 
   if (!session || !session.user?.email) {
@@ -35,7 +36,12 @@ export async function createResume(data: FormData) {
         name: data.content.name,
         title: data.content.title,
         summary: data.content.summary,
-        skills: data.content.skills
+        feSkills: data.content.feSkills,
+        beSkills: data.content.beSkills,
+        db: data.content.db,
+        apiDev: data.content.apiDev,
+        lang: data.content.lang,
+        versionCon: data.content.versionCon,
       }
     });
 
@@ -77,7 +83,8 @@ export async function createResume(data: FormData) {
         contentId: content.id,
         name: proj.name,
         description: proj.description,
-        tech: proj.tech
+        tech: proj.tech,
+        liveLink: proj.liveLink,
       }))
     });
 

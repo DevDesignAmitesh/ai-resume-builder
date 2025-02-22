@@ -33,6 +33,7 @@ interface Resume {
       name: string;
       description: string;
       tech: string[];
+      liveLink: string;
     }[];
   }[];
 }
@@ -277,6 +278,16 @@ const DarkResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing:
                   />
                 ) : (
                   <p className="text-muted-foreground">{project.description}</p>
+                )}
+                {isEditing ? (
+                  <input
+                    className="font-medium text-gray-900 w-full"
+                    value={project.liveLink}
+                    onChange={(e) => handleInputChange("projects", e.target.value, index, "liveLink")}
+                    placeholder="Project's Live Link"
+                  />
+                ) : (
+                  <h4 className="font-medium underline text-gray-900">{project.liveLink}</h4>
                 )}
                 {project.tech && project.tech.length > 0 && (
                   isEditing ? (
