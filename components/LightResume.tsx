@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Resume {
   content: {
@@ -28,7 +28,7 @@ interface Resume {
       linkedin: string;
       github: string;
     }[];
-    experince: {
+    experience: {
       company: string;
       position: string;
       duration: string;
@@ -60,50 +60,86 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
     summary: data.summary || "",
     skills: [ // Default skills data in the desired structure
       {
-        category: "Programming Languages",
+        category: data.lang.length > 0 && "Programming Languages",
         items: data.lang ?? [],
       },
       {
-        category: "Frontend Skills",
+        category: data.feSkills.length > 0 && "Frontend Skills",
         items: data.feSkills ?? [],
       },
       {
-        category: "Backend Skills",
+        category: data.beSkills.length > 0 && "Backend Skills",
         items: data.beSkills ?? [],
       },
       {
-        category: "Database",
+        category: data.db.length > 0 && "Database",
         items: data.db ?? [],
       },
       {
-        category: "Api Development",
+        category: data.apiDev.length > 0 && "Api Development",
         items: data.apiDev ?? [],
       },
       {
-        category: "Version Control",
+        category: data.versionCon.length > 0 && "Version Control",
         items: data.versionCon ?? [],
       }
     ],
     contact: data.contact || [{ email: "", phone: "", linkedin: "", github: "" }],
-    experince: data.experince || [],
+    experience: data.experience || [],
     education: data.education || [],
     projects: data.projects || [],
   });
 
   const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
-    setFormData((prev: any) => {
+    setFormData((prev: any) => {  
       if (index !== undefined && subField) {
         const updatedArray = [...prev[field as keyof typeof prev]];
         updatedArray[index] = { ...updatedArray[index], [subField]: value };
+
         return { ...prev, [field]: updatedArray };
       }
+
       if (field === "contact") {
-        return { ...prev, contact: [{ ...prev.contact[0], [subField!]: value }] }; // Ensure contact is always an array of one object
+        return {
+          ...prev,
+          contact: [{ ...prev.contact[0], [subField!]: value }],
+        };
       }
+
+      if (Array.isArray(prev[field as keyof typeof prev])) {
+        let updatedValue;
+
+        if (typeof value === "string") {
+          updatedValue = value
+            .split(",")
+            .map((item) => item.trim()) // Trim spaces
+            .filter((item) => item.length > 0); // Remove empty strings
+
+          // Convert [""] to []
+          if (updatedValue.length === 0) {
+            updatedValue = [];
+          }
+        } else if (Array.isArray(value)) {
+          updatedValue = value.filter((item) => item !== ""); // Ensure empty strings are removed
+        } else {
+          updatedValue = [];
+        }
+
+        return { ...prev, [field]: updatedValue };
+      }
+
       return { ...prev, [field]: value };
     });
-    setData(formData)
+
+    setData(formData);
   };
+
+
+
+  useEffect(() => {
+    console.log(formData)
+    setData(formData);
+  }, [formData, setData]);
 
 
   return (
@@ -163,14 +199,14 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                 {formData.contact[0].email && <span>{formData.contact[0].email}</span>}
                 {formData.contact[0].phone && <span>{formData.contact[0].phone}</span>}
                 {formData.contact[0].linkedin && (
-                  <a href={formData.contact[0].linkedin} className="text-blue-600 hover:underline" target="_blank">
+                  <Link href={formData.contact[0].linkedin} className="text-blue-600 hover:underline" target="_blank">
                     LinkedIn
-                  </a>
+                  </Link>
                 )}
                 {formData.contact[0].github && (
-                  <a href={formData.contact[0].github} className="text-blue-600 hover:underline" target="_blank">
+                  <Link href={formData.contact[0].github} className="text-blue-600 hover:underline" target="_blank">
                     GitHub
-                  </a>
+                  </Link>
                 )}
               </>
             )}
@@ -207,6 +243,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
             {isEditing ? (
               <div>
                 {formData.skills.map((skillCategory, index) => (
+                  skillCategory.category &&
                   <div key={index} className="mb-4">
                     <label className="block text-sm font-bold mb-2">{skillCategory.category}</label>
                     <input
@@ -247,11 +284,11 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
       )}
 
       {/* Experience Section */}
-      {formData.experince && formData.experince.length > 0 && (
+      {formData.experience && formData.experience.length > 0 && (
         <>
           <section className="space-y-4">
             <h3 className="text-xl font-semibold">Experience</h3>
-            {formData.experince.map((exp, index) => (
+            {formData.experience.map((exp, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between w-full items-start">
                   <div>
@@ -260,13 +297,13 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                         <input
                           className="font-medium text-gray-900 w-full"
                           value={exp.position}
-                          onChange={(e) => handleInputChange("experince", e.target.value, index, "position")}
+                          onChange={(e) => handleInputChange("experience", e.target.value, index, "position")}
                           placeholder="Position"
                         />
                         <input
                           className="text-gray-600 w-full"
                           value={exp.company}
-                          onChange={(e) => handleInputChange("experince", e.target.value, index, "company")}
+                          onChange={(e) => handleInputChange("experience", e.target.value, index, "company")}
                           placeholder="Company"
                         />
                       </>
@@ -281,7 +318,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                     <input
                       className="text-sm text-gray-600"
                       value={exp.duration}
-                      onChange={(e) => handleInputChange("experince", e.target.value, index, "duration")}
+                      onChange={(e) => handleInputChange("experience", e.target.value, index, "duration")}
                       placeholder="Duration"
                     />
                   ) : (
@@ -292,7 +329,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                   <textarea
                     className="text-gray-700 w-full"
                     value={exp.description.join("\n")}
-                    onChange={(e: any) => handleInputChange("experince", e.target.value.split("\n"), index, "description")}
+                    onChange={(e: any) => handleInputChange("experience", e.target.value.split("\n"), index, "description")}
                     placeholder="Description (one per line)"
                   />
                 ) : (

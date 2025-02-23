@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import {
@@ -135,6 +135,7 @@ const Index = () => {
         }
       }));
     }
+    localStorage.setItem("formData", JSON.stringify(formData))
   };
 
   const validateStep = (currentStep: number) => {
@@ -188,14 +189,18 @@ const Index = () => {
 
     if (step < 7) { // Update from 6 to 7
       setStep(step + 1);
+      localStorage.setItem("step", JSON.stringify(step + 1))
       setProgress((step / 7) * 100); // Update from 6 to 7
+      localStorage.setItem("progress", JSON.stringify((step / 7) * 100))
     }
   };
 
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
+      localStorage.setItem("step", JSON.stringify(step - 1))
       setProgress(((step - 2) / 7) * 100); // Update from 6 to 7
+      localStorage.setItem("progress", JSON.stringify(((step - 2) / 7) * 100))
     }
   };
 
@@ -219,23 +224,28 @@ const Index = () => {
     }
 
     let aiRes;
-
     try {
       aiRes = await aiResponse(formData)
     } catch (error) {
       setLoading(false)
+      toast({
+        title: "Something went wrong",
+        description: "Some error occured while creating resume",
+      });
       return;
     }
-    const res = await createResume(aiRes)
-
-    if (res.message === "resume created successfully") {
-      toast({
-        title: "Resume processed",
-        description: "Redirecting, to the preview page",
-      });
-      setLoading(false)
-      router.push(`/preview/${res.resume?.id}`)
-    } else {
+    try {
+      const res = await createResume(aiRes)
+      if (res.message === "resume created successfully") {
+        toast({
+          title: "Resume processed",
+          description: "Redirecting, to the preview page",
+        });
+        setLoading(false)
+        router.push(`/preview/${res.resume?.id}`)
+        localStorage.clear()
+      }
+    } catch (error) {
       toast({
         title: "Something went wrong",
         description: "Some error occured while creating resume",
@@ -243,6 +253,7 @@ const Index = () => {
       setLoading(false)
       return;
     }
+
   };
 
   const renderStep = () => {
@@ -577,6 +588,51 @@ const Index = () => {
         return null;
     }
   };
+
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("formData")!);
+    setFormData(data ?? {
+      content: {
+        name: "",
+        title: "",
+        contact: {
+          email: "",
+          phone: "",
+          linkedin: "",
+          github: "",
+        },
+        summary: "",
+        experience: [{
+          company: "",
+          position: "",
+          duration: "",
+          description: []
+        }],
+        education: [{
+          school: "",
+          degree: "",
+          duration: ""
+        }],
+        feSkills: [],
+        beSkills: [],
+        db: [],
+        apiDev: [],
+        lang: [],
+        versionCon: [],
+        projects: [{
+          name: "",
+          description: "",
+          tech: [],
+          liveLink: ""
+        }],
+        jobPostDetails: ""
+      }
+    })
+    const step = Number(localStorage.getItem("step"))
+    setStep(step === 0 ? 1 : step)
+    const progress = Number(localStorage.getItem("progress"))
+    setProgress(progress)
+  }, [])
 
   return (
     <>

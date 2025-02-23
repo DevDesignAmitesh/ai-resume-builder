@@ -13,21 +13,19 @@ import { toast } from "@/hooks/use-toast";
 const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boolean, resumeId: string }) => {
   const templates = [
     {
-      title: "Light Resume",
-      description: "A clean, formal, light-themed resume",
-      template: "light",
+      title: "First Template",
+      template: "first",
     },
     {
-      title: "Dark Resume",
-      description: "A bold, dark-themed resume",
-      template: "dark",
+      title: "Second Template",
+      template: "second",
     },
   ];
 
   const router = useRouter();
 
   // State to track the selected template
-  const [selectedTemplate, setSelectedTemplate] = useState("light");
+  const [selectedTemplate, setSelectedTemplate] = useState("first");
   const [data, setData] = useState<any>()
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -45,11 +43,6 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
         });
         setLoading(false)
         return;
-      } else {
-        toast({
-          title: "Something went wrong",
-        });
-        setLoading(false)
       }
     } catch (error) {
       setLoading(false)
@@ -79,14 +72,13 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
           </p>
         </div>}
 
-        <div className={`flex w-full ${isEditing && "pt-6"} items-center xl:items-start justify-center xl:flex-row flex-col gap-8`}>
+        <div className={`flex w-full ${isEditing && "pt-6"} items-center lg:items-start justify-center lg:flex-row flex-col gap-8`}>
           {/* Left Section: Template Selection */}
-          <div className="no-print w-full flex flex-col gap-4 xl:w-1/3">
+          <div className="no-print w-full flex flex-col gap-4 lg:w-1/3">
             {templates.map((template) => (
               <TemplateCard
                 key={template.template}
                 title={template.title}
-                description={template.description}
                 selectedTemplate={selectedTemplate}
                 setSelectedTemplate={setSelectedTemplate}
                 template={template.template}
@@ -96,10 +88,12 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
 
           {/* Right Section: Resume Display */}
           <div className="print flex justify-center items-center w-full xl:w-2/3">
-            {selectedTemplate === "light" ? (
+            {selectedTemplate === "first" ? (
               <LightResume isEditing={isEditing} setData={setData} resume={resume} />
             ) : (
-              <DarkResume isEditing={isEditing} setData={setData} resume={resume} />
+              <div className="flex justify-center items-center">
+                <p className="mt-20">Looking for another template...</p>
+              </div>
             )}
           </div>
         </div>

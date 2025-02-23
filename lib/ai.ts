@@ -5,7 +5,6 @@ import { config } from "dotenv";
 config();
 
 export async function aiResponse(formData: any) {
-  console.log(formData)
   const AI_PROMPT = `Given the following unstructured user input, correct any typos, grammatical errors, and inconsistencies while ensuring the data adheres to the structured format below. 
 
   **Instructions:**
@@ -28,7 +27,7 @@ export async function aiResponse(formData: any) {
   { 
     "name": "User's full name", 
     "title": "User's job title (updated to match the job post if provided)", 
-    "about": "A brief introduction tailored to the job post (if provided)", 
+    "jobPostDetails": "A brief introduction tailored to the job post (if provided)", 
     "contact": { 
       "github": "GitHub URL", 
       "linkedin": "LinkedIn URL", 
@@ -42,12 +41,12 @@ export async function aiResponse(formData: any) {
       "duration": "Start - End", 
       "description": ["Achievement 1", "Achievement 2"] 
     }], 
-    "feSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"],
-    "beSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"],
-    "db": ["postgres", "mongodb (prioritized based on job post)"],
-    "ApiDev": ["restful apis", "websockets (prioritized based on job post)"],
-    "versionCon": ["git", "github", "monorepo (prioritized based on job post)"],
-    "lang": ["javascript", "python (prioritized based on job post)"],
+    "feSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
+    "beSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
+    "db": ["postgres", "mongodb (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
+    "ApiDev": ["restful apis", "websockets (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
+    "versionCon": ["git", "github", "monorepo (prioritized based on job post)"], these can be optional if user didnot give this info then return an empty array like []
+    "lang": ["javascript", "python (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
     "projects": [{ 
       "name": "Project Name", 
       "description": "Brief description tailored to the job post (if provided)", 
@@ -69,7 +68,7 @@ export async function aiResponse(formData: any) {
 
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const userMessage = JSON.stringify(formData, null, 2);
+    const userMessage = JSON.stringify(formData);
 
     const result = await model.generateContent([AI_PROMPT, userMessage]);
 

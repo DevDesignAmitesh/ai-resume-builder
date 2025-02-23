@@ -4,7 +4,6 @@ import { FC } from "react";
 
 interface TemplateCardProps {
   title: string;
-  description: string;
   selectedTemplate: string;
   setSelectedTemplate: (template: string) => void;
   template: string;
@@ -12,7 +11,6 @@ interface TemplateCardProps {
 
 const TemplateCard: FC<TemplateCardProps> = ({
   title,
-  description,
   selectedTemplate,
   setSelectedTemplate,
   template,
@@ -27,7 +25,6 @@ const TemplateCard: FC<TemplateCardProps> = ({
       } hover:bg-foreground hover:text-background`}
     >
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
     </div>
   );
 };

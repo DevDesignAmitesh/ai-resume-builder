@@ -4,10 +4,22 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
+function cleanSkills(skills: any) {
+  return Array.isArray(skills)
+    ? skills
+      .filter(skill => skill.items?.length) // Remove skills with empty items
+      .map(skill => ({ ...skill, items: skill.items.filter((item: any) => item) })) // Remove empty strings inside items
+    : [];
+}
+
+
 export async function updateResume(resumeId: string, updatedData: any) {
+  console.log(updatedData.skills);
+  console.log(updatedData.projects);
   if (!updatedData || !resumeId) {
     return { message: "not found" }
   }
+
   try {
     const session = await getServerSession(auth);
 
@@ -39,6 +51,8 @@ export async function updateResume(resumeId: string, updatedData: any) {
       return { message: "resume not found" };
     }
 
+    const cleanedSkills = cleanSkills(updatedData.skills);
+
     // Update the Resume and its nested Content
     await prisma.resume.update({
       where: {
@@ -54,11 +68,12 @@ export async function updateResume(resumeId: string, updatedData: any) {
               name: updatedData.name || resume.content[0].name,
               title: updatedData.title || resume.content[0].title,
               summary: updatedData.summary || resume.content[0].summary,
-              feSkills: updatedData.skills || resume.content[0].feSkills,
-              beSkills: updatedData.skills || resume.content[0].beSkills,
-              db: updatedData.skills || resume.content[0].db,
-              versionCon: updatedData.skills || resume.content[0].versionCon,
-              lang: updatedData.skills || resume.content[0].lang,
+              lang: cleanedSkills[0] && cleanedSkills[0].items || resume.content[0].lang,
+              feSkills: cleanedSkills[1] && cleanedSkills[1].items || resume.content[0].feSkills,
+              beSkills: cleanedSkills[2] && cleanedSkills[2].items || resume.content[0].beSkills,
+              db: cleanedSkills[3] && cleanedSkills[3].items || resume.content[0].db,
+              apiDev: cleanedSkills[4] && cleanedSkills[4].items || resume.content[0].apiDev,
+              versionCon: cleanedSkills[5] && cleanedSkills[5].items || resume.content[0].versionCon,
               contact: updatedData.contact
                 ? {
                   updateMany: updatedData.contact.map((contact: any) => ({
@@ -117,6 +132,6 @@ export async function updateResume(resumeId: string, updatedData: any) {
 
     return { message: "Resume updated successfully" };
   } catch (error) {
-    return { message: "error" }
+    return { message: "error", error }
   }
 }

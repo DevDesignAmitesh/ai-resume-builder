@@ -42,12 +42,12 @@ model Content {
   experince  Experience[]
   education  Education[]
   projects   Projects[]
-  feSkills   String[]
-  beSkills   String[]
-  db         String[]
-  apiDev     String[]
-  versionCon String[]
-  lang       String[]
+  feSkills   String[]     @default([])
+  beSkills   String[]     @default([])
+  db         String[]     @default([])
+  apiDev     String[]     @default([])
+  versionCon String[]     @default([])
+  lang       String[]     @default([])
 }
 
 model Contact {

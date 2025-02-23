@@ -6,7 +6,6 @@ import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
 export async function createResume(data: FormData) {
-  console.log(data)
   const session = await getServerSession(auth);
 
   if (!session || !session.user?.email) {
@@ -36,12 +35,12 @@ export async function createResume(data: FormData) {
         name: data.content.name,
         title: data.content.title,
         summary: data.content.summary,
-        feSkills: data.content.feSkills,
-        beSkills: data.content.beSkills,
-        db: data.content.db,
-        apiDev: data.content.apiDev,
-        lang: data.content.lang,
-        versionCon: data.content.versionCon,
+        feSkills: data.content.feSkills ?? [],
+        beSkills: data.content.beSkills ?? [],
+        db: data.content.db ?? [],
+        apiDev: data.content.apiDev ?? [],
+        lang: data.content.lang ?? [],
+        versionCon: data.content.versionCon ?? [],
       }
     });
 
@@ -57,7 +56,7 @@ export async function createResume(data: FormData) {
     });
 
     // 4️⃣ Create Experience entries
-    await prisma.experience.createMany({
+    data.content.experience.length > 0 && await prisma.experience.createMany({
       data: data.content.experience.map(exp => ({
         contentId: content.id,
         company: exp.company,
@@ -68,7 +67,7 @@ export async function createResume(data: FormData) {
     });
 
     // 5️⃣ Create Education entries
-    await prisma.education.createMany({
+    data.content.education.length > 0 && await prisma.education.createMany({
       data: data.content.education.map(edu => ({
         contentId: content.id,
         school: edu.school,
@@ -78,7 +77,7 @@ export async function createResume(data: FormData) {
     });
 
     // 6️⃣ Create Project entries
-    await prisma.projects.createMany({
+    data.content.projects.length > 0 && await prisma.projects.createMany({
       data: data.content.projects.map(proj => ({
         contentId: content.id,
         name: proj.name,
