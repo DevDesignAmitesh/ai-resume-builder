@@ -91,7 +91,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
   });
 
   const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
-    setFormData((prev: any) => {  
+    setFormData((prev: any) => {
       if (index !== undefined && subField) {
         const updatedArray = [...prev[field as keyof typeof prev]];
         updatedArray[index] = { ...updatedArray[index], [subField]: value };
@@ -260,18 +260,20 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                   </div>
                 ))}
               </div>
-
-
             ) : (
-              <div className="space-y-3">
+              <div className="w-full">
                 {formData.skills.map((skillCategory, index) => (
-                  <div key={index} className="space-y-2">
-                    <h4 className="font-semibold">{skillCategory.category}</h4>
-                    <div className="flex flex-wrap gap-2">
+                  <div key={index} className="flex items-start w-full">
+                    {skillCategory.category &&
+                      <ul className="list-disc pl-5 w-[50%] min-w-fit">
+                        <li className="font-semibold">{skillCategory.category}</li>
+                      </ul>}
+                    <div className="w-full flex flex-wrap gap-2">
                       {skillCategory?.items?.map((skill, skillIndex) => (
-                        <Badge key={skillIndex} variant="secondary" className="text-sm">
+                        <span key={skillIndex} className="text-sm">
                           {skill}
-                        </Badge>
+                          {skillIndex !== skillCategory.items.length - 1 && ","}
+                        </span>
                       ))}
                     </div>
                   </div>
