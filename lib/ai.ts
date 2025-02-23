@@ -8,8 +8,6 @@ export async function aiResponse(formData: any) {
   const AI_PROMPT = `Given the following unstructured user input, correct any typos, grammatical errors, and inconsistencies while ensuring the data adheres to the structured format below. 
 
   **Instructions:**
-  - Fix spelling mistakes and grammar errors.
-  - Ensure consistency in formatting (e.g., capitalization, punctuation).
   - Structure the data according to the format below.
   - Maintain the original meaning and intent of the user's input.
   - If any of the fields, such as the "summary" or "project description", are too short or lack sufficient detail, expand on them by adding relevant information based on the user's other provided data. For example, if a project description is short, use the "skills" and "projects" sections to enrich the description with meaningful, relevant details. Ensure that the expansion doesn’t sound automated, repetitive, or generic. It should feel like an organic continuation based on the context the user has provided.
@@ -21,6 +19,8 @@ export async function aiResponse(formData: any) {
     - Modify the **experience** section to focus on roles and achievements that are most relevant to the job post.
     - Ensure the **language and tone** of the resume align with the job post's requirements.
   - Your content should sound like normal human language, not artificial or robotic.
+  - Fix spelling mistakes and grammar errors.
+  - Ensure consistency in formatting (e.g., capitalization, punctuation).
   - Return a valid JSON object.
 
   **Structured Format:**
