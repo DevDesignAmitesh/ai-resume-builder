@@ -8,20 +8,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  fullName  String
-  email     String   @unique
-  image     String
-  resume    Resume[]
-  Order     Order[]
-  isPremium Boolean  @default(false)
-}
-
-model Order {
-  id         String @id @default(uuid())
-  userId     String
-  purchaseId String
-  user       User   @relation(fields: [userId], references: [id])
+  id       String   @id @default(uuid())
+  fullName String
+  email    String   @unique
+  image    String
+  resume   Resume[]
 }
 
 model Resume {
@@ -32,22 +23,24 @@ model Resume {
 }
 
 model Content {
-  id         String       @id @default(uuid())
-  resume     Resume       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  resumeId   String
-  name       String
-  title      String
-  contact    Contact[]
-  summary    String
-  experince  Experience[]
-  education  Education[]
-  projects   Projects[]
-  feSkills   String[]     @default([])
-  beSkills   String[]     @default([])
-  db         String[]     @default([])
-  apiDev     String[]     @default([])
-  versionCon String[]     @default([])
-  lang       String[]     @default([])
+  id           String        @id @default(uuid())
+  resume       Resume        @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resumeId     String
+  name         String
+  title        String
+  contact      Contact[]
+  summary      String
+  experince    Experience[]
+  education    Education[]
+  projects     Projects[]
+  feSkills     String[]      @default([])
+  beSkills     String[]      @default([])
+  db           String[]      @default([])
+  apiDev       String[]      @default([])
+  versionCon   String[]      @default([])
+  lang         String[]      @default([])
+  achievements String[]
+  certificate  Certificate[]
 }
 
 model Contact {
@@ -87,4 +80,12 @@ model Projects {
   description String
   liveLink    String   @default("")
   tech        String[]
+}
+
+model Certificate {
+  id        String   @id @default(uuid())
+  Content   Content? @relation(fields: [contentId], references: [id])
+  contentId String?
+  name      String
+  date      String
 }

@@ -1,5 +1,3 @@
-// components/TemplateCard.tsx
-
 import { FC } from "react";
 
 interface TemplateCardProps {
@@ -18,11 +16,10 @@ const TemplateCard: FC<TemplateCardProps> = ({
   return (
     <div
       onClick={() => setSelectedTemplate(template)}
-      className={`cursor-pointer p-6 rounded-lg border-2 text-center resume-transition ${
-        selectedTemplate === template
+      className={`cursor-pointer p-6 rounded-lg border-2 text-center resume-transition ${selectedTemplate === template
           ? "bg-foreground text-background border-foreground"
           : "bg-background text-foreground border-border"
-      } hover:bg-foreground hover:text-background`}
+        } hover:bg-foreground hover:text-background`}
     >
       <h3 className="text-lg font-semibold">{title}</h3>
     </div>

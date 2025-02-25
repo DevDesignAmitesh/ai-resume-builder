@@ -1,7 +1,5 @@
 "use client";
 
-import LightResume from "@/components/LightResume";
-import DarkResume from "@/components/DarkResume"; // Assuming you have the DarkResume component ready
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,6 +7,9 @@ import TemplateCard from "@/components/TemplateCard";
 import { updateResume } from "@/app/api/actions/updateResume";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
+import ResumeTemplateOne from "@/components/ResumeTemplateOne";
+import ResumeTemplateTwo from "@/components/ResumeTemplateTwo";
+import ResumeTemplateThree from "@/components/ResumeTemplateThree";
 
 const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boolean, resumeId: string }) => {
   const templates = [
@@ -19,6 +20,10 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
     {
       title: "Second Template",
       template: "second",
+    },
+    {
+      title: "Third Template",
+      template: "third",
     },
   ];
 
@@ -89,11 +94,18 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
           {/* Right Section: Resume Display */}
           <div className="print flex justify-center items-center w-full xl:w-2/3">
             {selectedTemplate === "first" ? (
-              <LightResume isEditing={isEditing} setData={setData} resume={resume} />
+              <ResumeTemplateOne isEditing={isEditing} setData={setData} resume={resume} />
             ) : (
-              <div className="flex justify-center items-center">
-                <p className="mt-20">Looking for another template...</p>
-              </div>
+              selectedTemplate === "second" ? (
+                <ResumeTemplateTwo isEditing={isEditing} setData={setData} resume={resume} />
+              )
+                : selectedTemplate === "third" ? (
+                  <ResumeTemplateThree isEditing={isEditing} setData={setData} resume={resume} />
+                )
+                  :
+                  <div className="flex justify-center items-center">
+                    <p className="mt-20">Looking for another template...</p>
+                  </div>
             )}
           </div>
         </div>

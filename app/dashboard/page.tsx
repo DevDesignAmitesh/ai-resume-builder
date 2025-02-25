@@ -4,7 +4,6 @@ import { getAllResumes } from '../api/actions/getAllResumes'
 import { getServerSession } from 'next-auth'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { getUser } from '../api/actions/getUser'
 
 const page = async () => {
   const session = await getServerSession(auth)
@@ -14,9 +13,8 @@ const page = async () => {
   }
 
   const resumes = await getAllResumes()
-  const user = await getUser()
   return (
-    <Dashboard user={user.user} content={resumes.resume?.map((c) => c.content)} />
+    <Dashboard content={resumes.resume?.map((c) => c.content)} />
   )
 }
 

@@ -27,8 +27,9 @@ export async function getResume(id: string) {
           experince: true,
           education: true,
           projects: true,
-        }
-      }
+          certificate: true,
+        },
+      },
     }
   })
 

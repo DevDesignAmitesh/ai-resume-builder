@@ -12,10 +12,16 @@ function cleanSkills(skills: any) {
     : [];
 }
 
+function cleanAchievements(achievements: any) {
+  return Array.isArray(achievements)
+    ? achievements
+      .map((achievement: string) => achievement?.trim()) // Trim whitespace from each achievement
+      .filter((achievement: string) => achievement && achievement.length > 0) // Remove empty or falsy values
+    : [];
+}
+
 
 export async function updateResume(resumeId: string, updatedData: any) {
-  console.log(updatedData.skills);
-  console.log(updatedData.projects);
   if (!updatedData || !resumeId) {
     return { message: "not found" }
   }
@@ -52,6 +58,7 @@ export async function updateResume(resumeId: string, updatedData: any) {
     }
 
     const cleanedSkills = cleanSkills(updatedData.skills);
+    const cleanedAchievments = cleanAchievements(updatedData.achievements)
 
     // Update the Resume and its nested Content
     await prisma.resume.update({
@@ -124,6 +131,18 @@ export async function updateResume(resumeId: string, updatedData: any) {
                   })),
                 }
                 : undefined,
+              achievements: cleanedAchievments || resume.content[0].achievements,
+              certificate: updatedData.certificate ? {
+                updateMany: updatedData.certificate.map((cer: any) => ({
+                  where: {
+                    id: cer.id,
+                  },
+                  data: {
+                    name: cer.name,
+                    date: cer.date,
+                  }
+                }))
+              } : undefined
             },
           },
         },

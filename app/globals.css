@@ -31,7 +31,7 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
@@ -42,7 +42,7 @@
   .glass {
     @apply bg-white/10 backdrop-blur-lg border border-white/20;
   }
-  
+
   .preview-scroll {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;

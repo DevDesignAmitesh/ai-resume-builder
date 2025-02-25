@@ -6,9 +6,7 @@ import Link from "next/link";
 import { deleteResume } from "@/app/api/actions/deleteResume";
 import { useRouter } from "next/navigation";
 
-const Dashboard = ({ content, user }: { content: any; user: any }) => {
-  const isPremium = user?.isPremium; // Check if user is premium
-  const resumeLimit = isPremium ? Infinity : 3; // Unlimited for premium users
+const Dashboard = ({ content }: { content: any; }) => {
   const router = useRouter()
 
   const handleDelete = async (id: string) => {
@@ -24,26 +22,11 @@ const Dashboard = ({ content, user }: { content: any; user: any }) => {
         <h1 className="text-4xl font-bold mb-8">My Resumes</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {/* Allow creating new resumes only if user is under the limit */}
-          {safeContent.length < resumeLimit && (
-            <Link href={"/generate"} className="block">
-              <Card className="h-64 flex items-center justify-center group transition-all duration-300 hover:scale-105 bg-secondary/50 border border-border/50 backdrop-blur-xl">
-                <Plus className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
-              </Card>
-            </Link>
-          )}
-
-          {/* Show "Get Premium" if user is not premium and has reached the limit */}
-          {!isPremium && safeContent.length === 3 && (
-            <Link href={"/buy"} className="block">
-              <Card className="h-64 flex items-center justify-center group transition-all duration-300 hover:scale-105 bg-secondary/50 border border-border/50 backdrop-blur-xl">
-                <div className="flex flex-col-reverse gap-2 justify-center items-center">
-                  <p>Get Premium</p>
-                  <Gem className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </Card>
-            </Link>
-          )}
+          <Link href={"/generate"} className="block">
+            <Card className="h-64 flex items-center justify-center group transition-all duration-300 hover:scale-105 bg-secondary/50 border border-border/50 backdrop-blur-xl">
+              <Plus className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
+            </Card>
+          </Link>
 
           {/* Display existing resumes */}
           {safeContent.map((c: { id: string; title: string; resumeId: string }) => (

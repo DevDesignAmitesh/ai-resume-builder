@@ -18,7 +18,9 @@ export async function aiResponse(formData: any) {
     - Adjust **project descriptions** to highlight aspects that align with the job post's requirements (e.g., if the job post mentions "UI/UX design," ensure projects with design elements are emphasized).
     - Modify the **experience** section to focus on roles and achievements that are most relevant to the job post.
     - Ensure the **language and tone** of the resume align with the job post's requirements.
-  - Your content should sound like normal human language, not artificial or robotic.
+  - Use common sense when splitting technologies in the "projects" section. For example, if the user forgets to add a comma between technologies (e.g., "prisma postgress"), intelligently split them into separate entries (e.g., "Prisma", "PostgreSQL") rather than keeping them as a single string. Ensure proper capitalization and spelling (e.g., "postgress" should be corrected to "PostgreSQL").
+  - When the user enters a school or college name, search for and verify the correct spelling of the institution (e.g., check if "Stanfard University" should be "Stanford University" or "MIT Insitute" should be "MIT Institute"). Correct any misspellings to ensure accuracy, but only make changes based on widely recognized names and avoid over-correcting if the user’s input is clear and unique.
+  - Do not add excessive content if the user provides sufficient detail. Only expand or add minimal data when necessary, taking inspiration from the rest of the user’s data (e.g., skills, experience, or projects) to keep the content natural and relevant. Avoid adding generic or repetitive information.
   - Fix spelling mistakes and grammar errors.
   - Ensure consistency in formatting (e.g., capitalization, punctuation).
   - Return a valid JSON object.
@@ -54,10 +56,12 @@ export async function aiResponse(formData: any) {
       "liveLink": "https://linkoftheproject.com" 
     }], 
     "education": [{ 
-      "school": "School Name", 
+      "school": "School Name (corrected spelling if applicable)", 
       "degree": "Degree Name", 
       "duration": "Start - End" 
-    }] 
+    }],
+    "achievements": ["achievement 1", "achievement 2"],
+    "certificate": [{"name": "name of the certificate", "date": "the date of getting that certificate"}]
   }
 
   Return the structured output as **valid JSON**.`;

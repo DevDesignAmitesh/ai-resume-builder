@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -28,7 +27,7 @@ interface Resume {
       linkedin: string;
       github: string;
     }[];
-    experience: {
+    experince: {
       company: string;
       position: string;
       duration: string;
@@ -48,11 +47,10 @@ interface Resume {
   }[];
 }
 
-const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing: boolean, setData: any }) => {
+const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isEditing: boolean, setData: any }) => {
   const data = resume?.content?.[0];
 
   if (!data) return <p className="text-center text-muted-foreground">No resume data available</p>;
-
   // Initialize formData with the modified skills structure
   const [formData, setFormData] = useState({
     name: data.name || "John Doe",
@@ -85,10 +83,11 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
       }
     ],
     contact: data.contact || [{ email: "", phone: "", linkedin: "", github: "" }],
-    experience: data.experience || [],
+    experience: data.experince || [],
     education: data.education || [],
     projects: data.projects || [],
   });
+
 
   const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
     setFormData((prev: any) => {
@@ -134,18 +133,14 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
     setData(formData);
   };
 
-
-
   useEffect(() => {
-    console.log(formData)
     setData(formData);
   }, [formData, setData]);
-
 
   return (
     <div className="w-full mx-auto bg-white text-black p-8 rounded-xl space-y-6">
       {/* Header Section */}
-      <header className="text-center w-full space-y-4">
+      <header className="text-center w-full space-y-2">
         {isEditing ? (
           <input
             className="text-3xl font-bold w-full text-center"
@@ -214,12 +209,12 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
         )}
       </header>
 
-      <Separator />
+      <hr />
 
       {/* Summary Section */}
       {formData.summary && (
         <>
-          <section className="space-y-2">
+          <section className="space-y-1">
             <h3 className="text-xl font-semibold">Professional Summary</h3>
             {isEditing ? (
               <textarea
@@ -228,17 +223,17 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                 onChange={(e) => handleInputChange("summary", e.target.value)}
               />
             ) : (
-              <p className="text-gray-800 leading-relaxed">{formData.summary}</p>
+              <p className="text-gray-800 leading-[1.5]">{formData.summary}</p>
             )}
           </section>
-          <Separator />
+          <hr />
         </>
       )}
 
       {/* Skills Section */}
       {formData.skills && formData.skills.length > 0 && (
         <>
-          <section className="space-y-4">
+          <section className="space-y-2">
             <h3 className="text-xl font-semibold">Skills</h3>
             {isEditing ? (
               <div>
@@ -263,7 +258,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
             ) : (
               <div className="w-full">
                 {formData.skills.map((skillCategory, index) => (
-                  <div key={index} className="flex items-start w-full">
+                  <div key={index} className="flex justify-center items-center w-full">
                     {skillCategory.category &&
                       <ul className="list-disc pl-5 w-[50%] min-w-fit">
                         <li className="font-semibold">{skillCategory.category}</li>
@@ -281,7 +276,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
               </div>
             )}
           </section>
-          <Separator />
+          <hr />
         </>
       )}
 
@@ -344,17 +339,17 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
               </div>
             ))}
           </section>
-          <Separator />
+          <hr />
         </>
       )}
 
       {/* Projects Section */}
       {formData.projects && formData.projects.length > 0 && (
         <>
-          <section className="space-y-4">
+          <section className="space-y-2">
             <h3 className="text-xl font-semibold">Projects</h3>
             {formData.projects.map((project, index) => (
-              <div key={index} className="space-y-2">
+              <div key={index} className="space-y-1">
                 {isEditing ? (
                   <input
                     className="font-medium text-gray-900 w-full"
@@ -383,7 +378,7 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
                     placeholder="Project's Live Link"
                   />
                 ) : (
-                  <Link href={project.liveLink} target="_blank" className="font-medium text-gray-900">Live Demo: <span className="underline">{project.name}</span></Link>
+                  <Link href={project.liveLink} target="_blank" className="font-medium mb-1 text-gray-900">Live Demo: <span className="underline">{project.name}</span></Link>
                 )}
                 {project.tech && project.tech.length > 0 && (
                   isEditing ? (
@@ -406,14 +401,14 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
               </div>
             ))}
           </section>
-          <Separator />
+          <hr />
         </>
       )}
 
       {/* Education Section */}
       {formData.education && formData.education.length > 0 && (
         <>
-          <section className="space-y-4">
+          <section className="space-y-2">
             <h3 className="text-xl font-semibold">Education</h3>
             {formData.education.map((edu, index) => (
               <div key={index} className="flex w-full justify-between items-start">
@@ -459,4 +454,4 @@ const LightResume = ({ resume, isEditing, setData }: { resume: Resume, isEditing
   );
 };
 
-export default LightResume;
+export default ResumeTemplateOne;

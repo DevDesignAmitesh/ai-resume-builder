@@ -15,17 +15,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { User, Briefcase, GraduationCap, List, Phone, FileText, Linkedin, Github } from "lucide-react";
+import { User, Briefcase, GraduationCap, List, Phone, FileText, Linkedin, Github, Trophy } from "lucide-react";
 import { createResume } from "@/app/api/actions/createResume";
 import { useRouter } from "next/navigation";
 import { aiResponse } from "@/lib/ai";
-import { canCreateResume } from "@/app/api/actions/resumeLength";
 
 interface Experience {
   company: string;
   position: string;
   duration: string;
   description: string[];
+}
+
+interface Certificate {
+  name: string;
+  date: string;
 }
 
 interface Education {
@@ -63,6 +67,8 @@ interface Content {
   versionCon: string[];
   projects: Project[];
   jobPostDetails: string;
+  achievements: string[];
+  certificates: Certificate[];
 }
 
 export interface FormData {
@@ -86,30 +92,18 @@ const Index = () => {
         github: "",
       },
       summary: "",
-      experience: [{
-        company: "",
-        position: "",
-        duration: "",
-        description: []
-      }],
-      education: [{
-        school: "",
-        degree: "",
-        duration: ""
-      }],
+      experience: [],
+      education: [],
       feSkills: [],
       beSkills: [],
       db: [],
       apiDev: [],
       lang: [],
       versionCon: [],
-      projects: [{
-        name: "",
-        description: "",
-        tech: [],
-        liveLink: ""
-      }],
-      jobPostDetails: ""
+      projects: [],
+      jobPostDetails: "",
+      achievements: [],
+      certificates: [],
     }
   });
 
@@ -171,15 +165,41 @@ const Index = () => {
         }
         break;
       case 5:
-        if (!formData.content.education[0].school || !formData.content.education[0].degree) {
-          toast({
-            title: "Required Fields Missing",
-            description: "Please provide your educational background.",
-            variant: "destructive",
-          });
-          return false;
+        if (formData.content.education.length > 0) {
+          if (!formData.content.education[0].school || !formData.content.education[0].degree) {
+            toast({
+              title: "Required Fields Missing",
+              description: "Please provide your educational background.",
+              variant: "destructive",
+            });
+            return false;
+          }
+          break;
         }
-        break;
+      case 6:
+        if (formData.content.experience.length > 0) {
+          if (!formData.content.experience[0].company || !formData.content.experience[0].description || !formData.content.experience[0].duration || !formData.content.experience[0].position) {
+            toast({
+              title: "Required Fields Missing",
+              description: "Please provide your experience.",
+              variant: "destructive",
+            });
+            return false;
+          }
+          break;
+        }
+      case 7:
+        if (formData.content.projects.length > 0) {
+          if (!formData.content.projects[0].description || !formData.content.projects[0].name || !formData.content.projects[0].tech) {
+            toast({
+              title: "Required Fields Missing",
+              description: "Please provide your projects details.",
+              variant: "destructive",
+            });
+            return false;
+          }
+          break;
+        }
     }
     return true;
   };
@@ -187,10 +207,10 @@ const Index = () => {
   const handleNext = () => {
     if (!validateStep(step)) return;
 
-    if (step < 7) { // Update from 6 to 7
+    if (step < 8) {
       setStep(step + 1);
       localStorage.setItem("step", JSON.stringify(step + 1))
-      setProgress((step / 7) * 100); // Update from 6 to 7
+      setProgress((step / 8) * 100);
       localStorage.setItem("progress", JSON.stringify((step / 7) * 100))
     }
   };
@@ -199,8 +219,8 @@ const Index = () => {
     if (step > 1) {
       setStep(step - 1);
       localStorage.setItem("step", JSON.stringify(step - 1))
-      setProgress(((step - 2) / 7) * 100); // Update from 6 to 7
-      localStorage.setItem("progress", JSON.stringify(((step - 2) / 7) * 100))
+      setProgress(((step - 2) / 8) * 100);
+      localStorage.setItem("progress", JSON.stringify(((step - 2) / 8) * 100))
     }
   };
 
@@ -211,17 +231,6 @@ const Index = () => {
       title: "Processing your resume",
       description: "We're generating your professional resume...",
     });
-
-    const canCreate = await canCreateResume(); // Use updated function
-
-    if (!canCreate) {
-      toast({
-        title: "Free Limit Reached",
-        description: "Get Our Premium To Generate More",
-      });
-      setLoading(false)
-      return; // Stop execution if the limit is reached
-    }
 
     let aiRes;
     try {
@@ -362,10 +371,10 @@ const Index = () => {
       case 5:
         return (
           <div className="space-y-4 animate-fadeIn">
-            <div className="space-y-2">
+            <div className="space-y-2 flex justify-between flex-col items-start w-full">
               <Label htmlFor="education">Education</Label>
               {formData.content.education.map((edu, index) => (
-                <div key={index} className="space-y-2 p-4 border rounded-lg">
+                <div key={index} className="space-y-2 w-full p-4 border rounded-lg">
                   <Input
                     placeholder="School name"
                     value={edu.school}
@@ -395,16 +404,32 @@ const Index = () => {
                   />
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const newEducation = [...formData.content.education, { school: "", degree: "", duration: "" }];
-                  updateFormData("education", newEducation);
-                }}
-              >
-                Add Education
-              </Button>
+              <div className="flex w-full flex-row-reverse justify-between items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const newEducation = [...formData.content.education, { school: "", degree: "", duration: "" }];
+                    updateFormData("education", newEducation);
+                  }}
+                >
+                  Add Education
+                </Button>
+
+                {formData.content.education.length > 0 &&
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      if (formData.content.education.length >= 1) {
+                        const newEducation = formData.content.education.slice(0, -1);
+                        updateFormData("education", newEducation)
+                      }
+                    }}
+                  >
+                    Remove
+                  </Button>}
+              </div>
             </div>
           </div>
         );
@@ -453,18 +478,33 @@ const Index = () => {
                   />
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const newExperience = [...formData.content.experience, { company: "", position: "", duration: "", description: [""] }];
-                  updateFormData("experience", newExperience);
-                }}
-              >
-                Add Experience
-              </Button>
+              <div className="w-full flex flex-row-reverse justify-between items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const newExperience = [...formData.content.experience, { company: "", position: "", duration: "", description: [""] }];
+                    updateFormData("experience", newExperience);
+                  }}
+                >
+                  Add Experience
+                </Button>
+                {formData.content.experience.length > 0 &&
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      if (formData.content.experience.length >= 0) {
+                        const newExperience = formData.content.experience.slice(0, -1)
+                        updateFormData("experience", newExperience);
+                      }
+                    }}
+                  >
+                    Remove
+                  </Button>}
+              </div>
             </div>
-          </div>
+          </div >
         );
       case 7:
         return (
@@ -474,7 +514,6 @@ const Index = () => {
               <Input
                 id="lang"
                 placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
-
                 value={formData.content.lang.join(",")}
                 onChange={(e) => updateFormData("lang", e.target.value.split(","))}
               />
@@ -484,7 +523,6 @@ const Index = () => {
               <Input
                 id="feSkills"
                 placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
-
                 value={formData.content.feSkills.join(",")}
                 onChange={(e) => updateFormData("feSkills", e.target.value.split(","))}
               />
@@ -494,7 +532,6 @@ const Index = () => {
               <Input
                 id="beSkills"
                 placeholder="Nodejs, Express.js, JWT, OAuth, NextAuth..."
-
                 value={formData.content.beSkills.join("\n")}
                 onChange={(e) => updateFormData("beSkills", e.target.value.split("\n"))}
               />
@@ -504,7 +541,6 @@ const Index = () => {
               <Input
                 id="db"
                 placeholder="PostgreSQL, MongoDB, Redis...."
-
                 value={formData.content.db.join(",")}
                 onChange={(e) => updateFormData("db", e.target.value.split(","))}
               />
@@ -514,7 +550,6 @@ const Index = () => {
               <Input
                 id="apiDev"
                 placeholder="RESTful APIs, WebSockets..."
-
                 value={formData.content.apiDev.join(",")}
                 onChange={(e) => updateFormData("apiDev", e.target.value.split(","))}
               />
@@ -524,7 +559,6 @@ const Index = () => {
               <Input
                 id="versionCon"
                 placeholder="git, github, monorepos(turborepo)..."
-
                 value={formData.content.versionCon.join(",")}
                 onChange={(e) => updateFormData("versionCon", e.target.value.split(","))}
               />
@@ -571,15 +605,81 @@ const Index = () => {
                   />
                 </div>
               ))}
+              <div className="w-full flex justify-between items-center flex-row-reverse">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const newProjects = [...formData.content.projects, { name: "", description: "", tech: [""] }];
+                    updateFormData("projects", newProjects);
+                  }}
+                >
+                  Add Project
+                </Button>
+
+                {formData.content.projects.length > 0 &&
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      if (formData.content.projects.length > 0) {
+                        const newProjects = formData.content.projects.slice(0, -1)
+                        updateFormData("projects", newProjects);
+                      }
+                    }}
+                  >
+                    Remove
+                  </Button>}
+              </div>
+            </div>
+          </div>
+        );
+      case 8:
+        return (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="space-y-2">
+              <Label htmlFor="achievements">Achievements</Label>
+              <Textarea
+                id="achievements"
+                placeholder="List your achievements (one per line)"
+                className="h-32"
+                value={formData.content.achievements.join("\n")}
+                onChange={(e) => updateFormData("achievements", e.target.value.split("\n"))}
+              />
+            </div>
+            <div className="space-y-2 w-full flex flex-col justify-center items-start">
+              <Label htmlFor="certificates">Certificates</Label>
+              {formData.content.certificates.map((cert, index) => (
+                <div key={index} className="space-y-2 w-full p-4 border rounded-lg">
+                  <Input
+                    placeholder="Certificate name"
+                    value={cert.name}
+                    onChange={(e) => {
+                      const newCertificates = [...formData.content.certificates];
+                      newCertificates[index].name = e.target.value;
+                      updateFormData("certificates", newCertificates);
+                    }}
+                  />
+                  <Input
+                    placeholder="Date received"
+                    value={cert.date}
+                    onChange={(e) => {
+                      const newCertificates = [...formData.content.certificates];
+                      newCertificates[index].date = e.target.value;
+                      updateFormData("certificates", newCertificates);
+                    }}
+                  />
+                </div>
+              ))}
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  const newProjects = [...formData.content.projects, { name: "", description: "", tech: [""] }];
-                  updateFormData("projects", newProjects);
+                  const newCertificates = [...formData.content.certificates, { name: "", date: "" }];
+                  updateFormData("certificates", newCertificates);
                 }}
               >
-                Add Project
+                Add Certificate
               </Button>
             </div>
           </div>
@@ -590,44 +690,40 @@ const Index = () => {
   };
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("formData")!);
-    setFormData(data ?? {
-      content: {
-        name: "",
-        title: "",
-        contact: {
-          email: "",
-          phone: "",
-          linkedin: "",
-          github: "",
-        },
-        summary: "",
-        experience: [{
-          company: "",
-          position: "",
-          duration: "",
-          description: []
-        }],
-        education: [{
-          school: "",
-          degree: "",
-          duration: ""
-        }],
-        feSkills: [],
-        beSkills: [],
-        db: [],
-        apiDev: [],
-        lang: [],
-        versionCon: [],
-        projects: [{
-          name: "",
-          description: "",
-          tech: [],
-          liveLink: ""
-        }],
-        jobPostDetails: ""
+    const storedData = localStorage.getItem("formData");
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData && parsedData.content) {
+          setFormData({
+            content: {
+              ...parsedData.content,
+              achievements: parsedData.content.achievements || [],
+              certificates: parsedData.content.certificates || [],
+              experience: parsedData.content.experience || [{
+                company: "",
+                position: "",
+                duration: "",
+                description: []
+              }],
+              education: parsedData.content.education || [{
+                school: "",
+                degree: "",
+                duration: ""
+              }],
+              projects: parsedData.content.projects || [{
+                name: "",
+                description: "",
+                tech: [],
+                liveLink: ""
+              }],
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error parsing formData from localStorage:", error);
       }
-    })
+    }
     const step = Number(localStorage.getItem("step"))
     setStep(step === 0 ? 1 : step)
     const progress = Number(localStorage.getItem("progress"))
@@ -671,6 +767,9 @@ const Index = () => {
               <div className={`flex items-center ${step === 7 ? "text-primary" : "text-muted-foreground"}`}>
                 <FileText size={20} /> {/* New icon for job post details */}
               </div>
+              <div className={`flex items-center ${step === 8 ? "text-primary" : "text-muted-foreground"}`}>
+                <Trophy size={20} /> {/* New icon for achievements and certificates */}
+              </div>
             </div>
 
             {renderStep()}
@@ -685,9 +784,9 @@ const Index = () => {
               </Button>
               <Button
                 disabled={loading}
-                onClick={step === 7 ? handleSubmit : handleNext}
+                onClick={step === 8 ? handleSubmit : handleNext}
               >
-                {step === 7 ? loading ? "Generating" : "Generate Resume" : "Next"}
+                {step === 8 ? loading ? "Generating" : "Generate Resume" : "Next"}
               </Button>
             </div>
           </CardContent>
