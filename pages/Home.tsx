@@ -11,8 +11,9 @@ import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 
 
-const Home = ({ session }: { session: string }) => {
+const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
   const router = useRouter();
+  const feedback = Array.isArray(feedbacks) ? feedbacks.flat() : [];
 
   const handleStart = () => {
     signIn("google", { callbackUrl: "/dashboard" })
@@ -164,7 +165,7 @@ const Home = ({ session }: { session: string }) => {
             What Our Users Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+            {feedback?.map((feed: any, index: any) => (
               <Card key={index} className="p-6">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-start gap-4">
@@ -172,13 +173,13 @@ const Home = ({ session }: { session: string }) => {
                       <Check className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold">{testimonial.name}</p>
+                      <p className="font-semibold">{feed.User.fullName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {testimonial.role} at {testimonial.company}
+                        User of this app
                       </p>
                     </div>
                   </div>
-                  <p className="text-muted-foreground">{testimonial.content}</p>
+                  <p className="text-muted-foreground">{feed.content}</p>
                 </div>
               </Card>
             ))}

@@ -12,9 +12,11 @@ import Templates from "@/components/Templates";
 import { Toaster } from "@/components/ui/toaster";
 import { deleteResume } from "@/app/api/actions/deleteResume";
 import { useRouter } from "next/navigation";
+import { addFeedback } from "@/app/api/actions/addFeedback";
 
 const Dashboard = ({ content }: { content: any }) => {
   const [feedback, setFeedback] = useState("");
+  const [loading, setLoading] = useState(false)
   const { toast } = useToast();
   const router = useRouter();
 
@@ -25,12 +27,28 @@ const Dashboard = ({ content }: { content: any }) => {
     router.refresh();
   };
 
-  const handleFeedbackSubmit = () => {
-    toast({
-      title: "Thank you for your feedback!",
-      description: "We appreciate your input and will use it to improve our service.",
-    });
-    setFeedback("");
+  const handleFeedbackSubmit = async () => {
+    if (!feedback) {
+      alert("Provide Some Feedback")
+      return
+    }
+    setLoading(true)
+    const res = await addFeedback(feedback)
+
+    if (res.message === "feedback added") {
+      toast({
+        title: "Thank you for your feedback!",
+        description: "We appreciate your input and will use it to improve our service.",
+      });
+      setLoading(false)
+      setFeedback("");
+    } else {
+      toast({
+        title: "Something went wrong",
+        variant: "destructive"
+      });
+      setLoading(false)
+    }
   };
 
   return (
@@ -46,9 +64,9 @@ const Dashboard = ({ content }: { content: any }) => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Not Working**</DialogTitle>
+              <DialogTitle>Send Feedback</DialogTitle>
             </DialogHeader>
-            {/* <div className="space-y-4 pt-4">
+            <div className="space-y-4 pt-4">
               <Textarea
                 placeholder="Tell us what you think about our resume builder..."
                 value={feedback}
@@ -56,12 +74,12 @@ const Dashboard = ({ content }: { content: any }) => {
                 className="min-h-[150px]"
               />
               <div className="flex justify-end">
-                <Button onClick={handleFeedbackSubmit} className="gap-2">
+                <Button disabled={loading} onClick={handleFeedbackSubmit} className="gap-2">
                   <Send className="w-4 h-4" />
-                  Send Feedback
+                  {loading ? "Sending Feedback" : "Send Feedback"}
                 </Button>
               </div>
-            </div> */}
+            </div>
           </DialogContent>
         </Dialog>
       </div>
