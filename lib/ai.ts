@@ -24,9 +24,12 @@ export async function aiResponse(formData: any) {
   - Fix spelling mistakes and grammar errors.
   - Ensure consistency in formatting (e.g., capitalization, punctuation).
   - Return a valid JSON object.
+  - Ensure the output is wrapped in a "content" object, mirroring the input structure.
 
   **Structured Format:**
-  { 
+  {
+    "content": 
+    { 
     "name": "User's full name", 
     "title": "User's job title (updated to match the job post if provided)", 
     "jobPostDetails": "A brief introduction tailored to the job post (if provided)", 
@@ -42,13 +45,8 @@ export async function aiResponse(formData: any) {
       "position": "Job Title", 
       "duration": "Start - End", 
       "description": ["Achievement 1", "Achievement 2"] 
-    }], 
-    "feSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
-    "beSkills": ["Skill 1", "Skill 2 (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
-    "db": ["postgres", "mongodb (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
-    "ApiDev": ["restful apis", "websockets (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
-    "versionCon": ["git", "github", "monorepo (prioritized based on job post)"], these can be optional if user didnot give this info then return an empty array like []
-    "lang": ["javascript", "python (prioritized based on job post)"] these can be optional if user didnot give this info then return an empty array like [],
+    }],
+    "skills": [{ "skill category", ["skill 1", "skill 2"] }] these can be optional if user didnot give this info then return an empty array like [],
     "projects": [{ 
       "name": "Project Name", 
       "description": "Brief description tailored to the job post (if provided)", 
@@ -63,14 +61,14 @@ export async function aiResponse(formData: any) {
     "achievements": ["achievement 1", "achievement 2"],
     "certificate": [{"name": "name of the certificate", "date": "the date of getting that certificate"}]
   }
+}
 
   Return the structured output as **valid JSON**.`;
-
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const userMessage = JSON.stringify(formData);
 
@@ -87,6 +85,6 @@ export async function aiResponse(formData: any) {
     return JSON.parse(jsonString);
   } catch (error) {
     console.error("Error in AI Response:", error);
-    return { error: "Failed to process data." };
+    return { message: "Failed to process data." };
   }
 }

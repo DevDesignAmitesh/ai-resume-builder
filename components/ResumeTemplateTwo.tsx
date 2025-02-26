@@ -58,75 +58,15 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
   if (!data) return <p className="text-center text-muted-foreground">No resume data available</p>;
   // Initialize formData with data from props where available, using dummy data for missing fields
   const [formData, setFormData] = useState({
-    name: data.name || "John Doe",
-    title: data.title || "Software Engineer",
-    skills: [ // Default skills data in the desired structure
-      {
-        category: data.lang.length > 0 && "Programming Languages",
-        items: data.lang ?? [],
-      },
-      {
-        category: data.feSkills.length > 0 && "Frontend Skills",
-        items: data.feSkills ?? [],
-      },
-      {
-        category: data.beSkills.length > 0 && "Backend Skills",
-        items: data.beSkills ?? [],
-      },
-      {
-        category: data.db.length > 0 && "Database",
-        items: data.db ?? [],
-      },
-      {
-        category: data.apiDev.length > 0 && "Api Development",
-        items: data.apiDev ?? [],
-      },
-      {
-        category: data.versionCon.length > 0 && "Version Control",
-        items: data.versionCon ?? [],
-      }
-    ],
-    contact: data.contact && data.contact.length > 0 ? data.contact : [
-      {
-        email: "example@email.com",
-        phone: "",
-        linkedin: "",
-        github: "github.com/username",
-      },
-    ],
-    experience: data.experince || [
-      {
-        company: "Company Name",
-        position: "Software Developer",
-        duration: "Jan 2023 - Present",
-        description: ["Developed web applications using modern frameworks.", "Collaborated with cross-functional teams."],
-      },
-    ],
-    education: data.education || [
-      {
-        school: "University Name",
-        degree: "Bachelor of Technology - Computer Science",
-        duration: "Aug 2019 - May 2023",
-      },
-    ],
-    projects: data.projects || [
-      {
-        name: "Project Name",
-        description: "Developed a web application using React and Node.js.",
-        tech: ["React", "Node.js", "MySQL"],
-        liveLink: "",
-      },
-    ],
-    achievements: data.achievements || [
-      "Achieved top 10% in coding competition.",
-      "Published a technical blog on modern development practices.",
-    ],
-    certifications: data.certificate || [
-      {
-        name: "Certified Developer - Framework",
-        date: "January 2024",
-      },
-    ],
+    name: data.name || "",
+    title: data.title || "",
+    skills: data.skills || [],
+    contact: data.contact && data.contact.length > 0 ? data.contact : [],
+    experience: data.experince || [],
+    education: data.education || [],
+    projects: data.projects || [],
+    achievements: data.achievements || [],
+    certifications: data.certificate || [],
   });
 
   const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
@@ -259,9 +199,8 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
             )}
           </div>
         )}
+        <hr />
       </header>
-
-      <hr />
 
       {/* Skills Section */}
       {formData.skills && formData.skills.length > 0 && (
@@ -309,13 +248,13 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
               </div>
             )}
           </section>
+          <hr />
         </>
       )}
 
       {/* Experience Section */}
       {formData.experience && formData.experience.length > 0 && (
         <>
-          <hr />
           <section className="space-y-4">
             <h3 className="text-xl font-semibold">Experience</h3>
             {formData.experience.map((exp, index) => (
@@ -382,7 +321,7 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
           <section className="space-y-2">
             <h3 className="text-xl font-semibold">Projects</h3>
             {formData.projects.map((project, index) => (
-              <div key={index} className="space-y-1">
+              <div key={index} className="space-y-2">
                 {isEditing ? (
                   <input
                     className="font-medium text-gray-900 w-full"
@@ -391,8 +330,9 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
                     placeholder="Project Name"
                   />
                 ) : (
-                  <h4 className="font-medium text-gray-900">{project.name}</h4>
-                )}
+                  <li>
+                    <ul className="font-medium text-gray-900 inline-block ml-[-8px]">{project.name}</ul>
+                  </li>)}
                 {isEditing ? (
                   <textarea
                     className="text-gray-700 w-full"
@@ -434,6 +374,7 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
               </div>
             ))}
           </section>
+          <hr />
         </>
       )}
 
@@ -457,7 +398,6 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
           ) : (
             formData.achievements && formData.achievements.length > 0 &&
             <>
-              <hr />
               <h3 className="text-xl font-semibold">Achievements</h3>
               <ul className="list-disc list-inside text-gray-700 space-y-1">
                 {(formData.achievements || []).map((achievement, i) => (

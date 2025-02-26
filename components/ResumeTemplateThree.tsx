@@ -59,59 +59,15 @@ const ResumeTemplateThree = ({ resume, isEditing, setData }: { resume: Resume, i
 
   // Initialize formData with data from props where available, using dummy data for missing fields
   const [formData, setFormData] = useState({
-    name: data.name || "YOUR NAME",
+    name: data.name || "",
     title: data.title || "",
-    skills: [ // Default skills data in the desired structure, matching PDF
-      {
-        category: data.lang.length > 0 && "Skills",
-        items: [...(data.lang || []), ...(data.feSkills || []), ...(data.beSkills || [])].filter(Boolean),
-      },
-    ],
-    contact: data.contact && data.contact.length > 0 ? data.contact : [
-      {
-        email: "YOUR_NAME@gmail.com",
-        phone: "(+91) 0000000000",
-        linkedin: "",
-        github: "/you-full-name",
-      },
-    ],
-    experience: data.experince || [
-      {
-        company: "Company Name",
-        position: "Your Position",
-        duration: "Date",
-        description: ["Work that you did - Technologies"],
-      },
-    ],
-    education: data.education || [
-      {
-        school: "College Branch | College",
-        degree: "CGPA: X.X",
-        duration: "Date",
-      },
-      {
-        school: "School",
-        degree: "XII (CBSE)",
-        duration: "XX.X% | 20XX",
-      },
-    ],
-    projects: data.projects || [
-      {
-        name: "Project Title",
-        description: "Project details",
-        tech: [],
-        liveLink: "",
-      },
-    ],
-    achievements: data.achievements || [
-      "Mention your achievements",
-    ],
-    certifications: data.certificate || [
-      {
-        name: "Certified Developer - Framework",
-        date: "January 2024",
-      },
-    ],
+    skills: data.skills || [],
+    contact: data.contact && data.contact.length > 0 ? data.contact : [],
+    experience: data.experince || [],
+    education: data.education || [],
+    projects: data.projects || [],
+    achievements: data.achievements || [],
+    certifications: data.certificate || [],
   });
 
   const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
@@ -223,9 +179,8 @@ const ResumeTemplateThree = ({ resume, isEditing, setData }: { resume: Resume, i
             )}
           </div>
         )}
+        <hr />
       </header>
-
-      <hr />
 
       {/* Skills Section */}
       {formData.skills && formData.skills.length > 0 && (
@@ -402,8 +357,9 @@ const ResumeTemplateThree = ({ resume, isEditing, setData }: { resume: Resume, i
                     placeholder="Project Name"
                   />
                 ) : (
-                  <h4 className="font-medium text-gray-900">{project.name}</h4>
-                )}
+                  <li>
+                    <ul className="font-medium text-gray-900 inline-block ml-[-8px]">{project.name}</ul>
+                  </li>)}
                 {isEditing ? (
                   <textarea
                     className="text-gray-700 w-full"

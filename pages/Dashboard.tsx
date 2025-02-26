@@ -1,68 +1,140 @@
 "use client";
 
-import { Gem, Plus, Pencil, Trash, Eye } from "lucide-react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Eye, FileText, MessageSquare, Trash, Pencil, Send } from "lucide-react";
 import Link from "next/link";
+import Templates from "@/components/Templates";
+import { Toaster } from "@/components/ui/toaster";
 import { deleteResume } from "@/app/api/actions/deleteResume";
 import { useRouter } from "next/navigation";
 
-const Dashboard = ({ content }: { content: any; }) => {
-  const router = useRouter()
-
-  const handleDelete = async (id: string) => {
-    await deleteResume(id)
-    router.refresh()
-  }
+const Dashboard = ({ content }: { content: any }) => {
+  const [feedback, setFeedback] = useState("");
+  const { toast } = useToast();
+  const router = useRouter();
 
   const safeContent = Array.isArray(content) ? content.flat() : []; // Ensure it's an array
 
+  const handleDelete = async (id: string) => {
+    await deleteResume(id);
+    router.refresh();
+  };
+
+  const handleFeedbackSubmit = () => {
+    toast({
+      title: "Thank you for your feedback!",
+      description: "We appreciate your input and will use it to improve our service.",
+    });
+    setFeedback("");
+  };
+
   return (
-    <div className="min-h-screen p-8 bg-background">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">My Resumes</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <Link href={"/generate"} className="block">
-            <Card className="h-64 flex items-center justify-center group transition-all duration-300 hover:scale-105 bg-secondary/50 border border-border/50 backdrop-blur-xl">
-              <Plus className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
-            </Card>
-          </Link>
-
-          {/* Display existing resumes */}
-          {safeContent.map((c: { id: string; title: string; resumeId: string }) => (
-            <Card key={c.id} className="h-64 relative group transition-all duration-300 hover:scale-105 bg-secondary/50 border border-border/50 backdrop-blur-xl overflow-hidden">
-              {/* Hover Overlay with Title */}
-              <div className="absolute inset-0 bg-black/60 opacity-50 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4 z-10">
-                <h3 className="text-lg capitalize font-medium text-white text-center">
-                  {c.title}
-                </h3>
+    <div className="min-h-screen w-full flex flex-col items-center justify-start p-8 bg-background">
+      {/* Feedback Button (Top-Right Corner) */}
+      <div className="absolute top-8 right-8">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Give Feedback
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Not Working**</DialogTitle>
+            </DialogHeader>
+            {/* <div className="space-y-4 pt-4">
+              <Textarea
+                placeholder="Tell us what you think about our resume builder..."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                className="min-h-[150px]"
+              />
+              <div className="flex justify-end">
+                <Button onClick={handleFeedbackSubmit} className="gap-2">
+                  <Send className="w-4 h-4" />
+                  Send Feedback
+                </Button>
               </div>
-
-              {/* Edit, Delete & View Buttons (Visible on Hover) */}
-              <div className="absolute z-[100] bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
-                {/* View Button */}
-                <Link href={`/preview/${c.resumeId}`}>
-                  <button className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    <Eye className="w-5 h-5" />
-                  </button>
-                </Link>
-
-                {/* Edit Button */}
-                <Link href={`/edit/${c.resumeId}`}>
-                  <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    <Pencil className="w-5 h-5" />
-                  </button>
-                </Link>
-
-                {/* Delete Button */}
-                <button onClick={() => handleDelete(c.resumeId)} className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                  <Trash className="w-5 h-5" />
-                </button>
-              </div>
-            </Card>
-          ))}
-        </div>
+            </div> */}
+          </DialogContent>
+        </Dialog>
       </div>
+
+      {/* Main Content Section */}
+      <main className="w-full max-w-3xl space-y-12">
+        {/* Header Section */}
+        <header className="text-left mb-12">
+          <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
+          <p className="text-muted-foreground">Create, manage, and track your resumes</p>
+        </header>
+        {/* Create New Resume Card */}
+        <Link href="/generate">
+          <Card className="p-8 hover:scale-[1.02] transition-transform duration-300 bg-secondary/50 border border-border/50">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <FileText className="w-12 h-12 text-primary" />
+              <h2 className="text-2xl font-semibold">Create New Resume</h2>
+              <p className="text-muted-foreground text-center">
+                Start building your professional resume with our AI-powered tools
+              </p>
+            </div>
+          </Card>
+        </Link>
+
+        {/* Recent Resumes Section */}
+        {
+          safeContent.length > 0 &&
+          <section className="w-full">
+            <h2 className="text-2xl font-semibold mb-4">Recent Resumes</h2>
+            <div className="flex flex-col justify-center items-center gap-4 w-full">
+              {safeContent.map((resume) => (
+                <Card
+                  key={resume.id}
+                  className="p-4 group relative w-full hover:scale-[1.02] transition-transform duration-300 bg-secondary/50 border border-border/50 backdrop-blur-xl"
+                >
+                  <div className="flex items-start space-x-4">
+                    <FileText className="w-6 h-6 text-primary" />
+                    <div className="flex-1">
+                      <h3 className="font-medium truncate">{resume.title}</h3>
+                      <p className="text-sm text-muted-foreground">{resume.lastModified}</p>
+                    </div>
+                  </div>
+                  {/* Action Buttons */}
+                  <div className="flex absolute opacity-0 group-hover:opacity-100 transition-opacity right-2 top-[9px] gap-4 items-center justify-center">
+                    <Link href={`/preview/${resume.resumeId}`}>
+                      <button className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </Link>
+                    {/* Edit Button */}
+                    <Link href={`/edit/${resume.resumeId}`}>
+                      <button className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <Pencil className="w-5 h-5" />
+                      </button>
+                    </Link>
+
+                    {/* Delete Button */}
+                    <button onClick={() => handleDelete(resume.resumeId)} className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                      <Trash className="w-5 h-5" />
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+        }
+
+        {/* Templates Section (unchanged) */}
+        <Templates isTextCenter={false} />
+      </main>
+
+      {/* Toast Notifications */}
+      <Toaster />
     </div>
   );
 };

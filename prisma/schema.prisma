@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(uuid())
+  id       String     @id @default(uuid())
   fullName String
-  email    String   @unique
+  email    String     @unique
   image    String
   resume   Resume[]
+  feedback Feedback[]
 }
 
 model Resume {
@@ -33,12 +34,7 @@ model Content {
   experince    Experience[]
   education    Education[]
   projects     Projects[]
-  feSkills     String[]      @default([])
-  beSkills     String[]      @default([])
-  db           String[]      @default([])
-  apiDev       String[]      @default([])
-  versionCon   String[]      @default([])
-  lang         String[]      @default([])
+  skills       Skills[]
   achievements String[]
   certificate  Certificate[]
 }
@@ -84,8 +80,23 @@ model Projects {
 
 model Certificate {
   id        String   @id @default(uuid())
-  Content   Content? @relation(fields: [contentId], references: [id])
+  Content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
   contentId String?
   name      String
   date      String
+}
+
+model Skills {
+  id        String   @id @default(uuid())
+  category  String
+  items     String[]
+  Content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId String?
+}
+
+model Feedback {
+  id      String  @id @default(uuid())
+  content String
+  User    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String?
 }

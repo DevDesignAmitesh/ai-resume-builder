@@ -53,36 +53,11 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
   if (!data) return <p className="text-center text-muted-foreground">No resume data available</p>;
   // Initialize formData with the modified skills structure
   const [formData, setFormData] = useState({
-    name: data.name || "John Doe",
-    title: data.title || "Full Stack Developer",
+    name: data.name || "",
+    title: data.title || "",
     summary: data.summary || "",
-    skills: [ // Default skills data in the desired structure
-      {
-        category: data.lang.length > 0 && "Programming Languages",
-        items: data.lang ?? [],
-      },
-      {
-        category: data.feSkills.length > 0 && "Frontend Skills",
-        items: data.feSkills ?? [],
-      },
-      {
-        category: data.beSkills.length > 0 && "Backend Skills",
-        items: data.beSkills ?? [],
-      },
-      {
-        category: data.db.length > 0 && "Database",
-        items: data.db ?? [],
-      },
-      {
-        category: data.apiDev.length > 0 && "Api Development",
-        items: data.apiDev ?? [],
-      },
-      {
-        category: data.versionCon.length > 0 && "Version Control",
-        items: data.versionCon ?? [],
-      }
-    ],
-    contact: data.contact || [{ email: "", phone: "", linkedin: "", github: "" }],
+    skills: data.skills || [],
+    contact: data.contact || [],
     experience: data.experince || [],
     education: data.education || [],
     projects: data.projects || [],
@@ -130,7 +105,6 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
       return { ...prev, [field]: value };
     });
 
-    setData(formData);
   };
 
   useEffect(() => {
@@ -207,28 +181,25 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
             )}
           </div>
         )}
+        <hr />
       </header>
 
-      <hr />
-
       {/* Summary Section */}
-      {formData.summary && (
-        <>
-          <section className="space-y-1">
-            <h3 className="text-xl font-semibold">Professional Summary</h3>
-            {isEditing ? (
-              <textarea
-                className="text-gray-800 leading-relaxed w-full"
-                value={formData.summary}
-                onChange={(e) => handleInputChange("summary", e.target.value)}
-              />
-            ) : (
-              <p className="text-gray-800 leading-[1.5]">{formData.summary}</p>
-            )}
-          </section>
-          <hr />
-        </>
-      )}
+      <>
+        <section className="space-y-1">
+          <h3 className="text-xl font-semibold">Professional Summary</h3>
+          {isEditing ? (
+            <textarea
+              className="text-gray-800 leading-relaxed w-full"
+              value={formData.summary}
+              onChange={(e) => handleInputChange("summary", e.target.value)}
+            />
+          ) : (
+            formData.summary && <p className="text-gray-800 leading-[1.5]">{formData.summary}</p>
+          )}
+        </section>
+        <hr />
+      </>
 
       {/* Skills Section */}
       {formData.skills && formData.skills.length > 0 && (
@@ -358,7 +329,9 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
                     placeholder="Project Name"
                   />
                 ) : (
-                  <h4 className="font-medium text-gray-900">{project.name}</h4>
+                  <li>
+                    <ul className="font-medium text-gray-900 inline-block ml-[-8px]">{project.name}</ul>
+                  </li>
                 )}
                 {isEditing ? (
                   <textarea

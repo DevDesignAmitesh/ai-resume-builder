@@ -28,6 +28,7 @@ export async function getResume(id: string) {
           education: true,
           projects: true,
           certificate: true,
+          skills: true,
         },
       },
     }

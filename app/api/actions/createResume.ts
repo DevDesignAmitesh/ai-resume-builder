@@ -35,12 +35,6 @@ export async function createResume(data: FormData) {
         name: data.content.name || "",
         title: data.content.title || "",
         summary: data.content.summary || "",
-        feSkills: data.content.feSkills ?? [],
-        beSkills: data.content.beSkills ?? [],
-        db: data.content.db ?? [],
-        apiDev: data.content.apiDev ?? [],
-        lang: data.content.lang ?? [],
-        versionCon: data.content.versionCon ?? [],
         achievements: data.content.achievements ?? [],
       }
     });
@@ -54,7 +48,7 @@ export async function createResume(data: FormData) {
       github: data.content.contact.github || "",
     };
 
-    if (Object.values(contactData).some(value => 
+    if (Object.values(contactData).some(value =>
       typeof value === "string" && value.trim().length > 0
     )) {
       await prisma.contact.create({
@@ -64,10 +58,10 @@ export async function createResume(data: FormData) {
 
     // 4️⃣ Create Experience entries only if there’s data
     if (data.content.experience && data.content.experience.length > 0) {
-      const experienceData = data.content.experience.filter(exp => 
-        exp.company.trim().length > 0 || 
-        exp.position.trim().length > 0 || 
-        exp.duration.trim().length > 0 || 
+      const experienceData = data.content.experience.filter(exp =>
+        exp.company.trim().length > 0 ||
+        exp.position.trim().length > 0 ||
+        exp.duration.trim().length > 0 ||
         (exp.description && exp.description.length > 0)
       );
 
@@ -86,9 +80,9 @@ export async function createResume(data: FormData) {
 
     // 5️⃣ Create Education entries only if there’s data
     if (data.content.education && data.content.education.length > 0) {
-      const educationData = data.content.education.filter(edu => 
-        edu.school.trim().length > 0 || 
-        edu.degree.trim().length > 0 || 
+      const educationData = data.content.education.filter(edu =>
+        edu.school.trim().length > 0 ||
+        edu.degree.trim().length > 0 ||
         edu.duration.trim().length > 0
       );
 
@@ -104,12 +98,22 @@ export async function createResume(data: FormData) {
       }
     }
 
+    if (data.content.skills && data.content.skills.length > 0) {
+      await prisma.skills.createMany({
+        data: data.content.skills.map((skill) => ({
+          contentId: content.id,
+          category: skill.category,
+          items: skill.items,
+        }))
+      })
+    }
+
     // 6️⃣ Create Project entries only if there’s data
     if (data.content.projects && data.content.projects.length > 0) {
-      const projectData = data.content.projects.filter(proj => 
-        proj.name.trim().length > 0 || 
-        proj.description.trim().length > 0 || 
-        (proj.tech && proj.tech.length > 0) || 
+      const projectData = data.content.projects.filter(proj =>
+        proj.name.trim().length > 0 ||
+        proj.description.trim().length > 0 ||
+        (proj.tech && proj.tech.length > 0) ||
         proj.liveLink.trim().length > 0
       );
 
@@ -128,8 +132,8 @@ export async function createResume(data: FormData) {
 
     // 7️⃣ Create Certificate entries only if there’s data
     if (data.content.certificates && data.content.certificates.length > 0) {
-      const certificateData = data.content.certificates.filter(cer => 
-        cer.name.trim().length > 0 || 
+      const certificateData = data.content.certificates.filter(cer =>
+        cer.name.trim().length > 0 ||
         cer.date.trim().length > 0
       );
 

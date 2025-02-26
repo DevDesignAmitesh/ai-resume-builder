@@ -4,86 +4,100 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
-function cleanSkills(skills: any) {
-  return Array.isArray(skills)
-    ? skills
-      .filter(skill => skill.items?.length) // Remove skills with empty items
-      .map(skill => ({ ...skill, items: skill.items.filter((item: any) => item) })) // Remove empty strings inside items
-    : [];
-}
-
-function cleanAchievements(achievements: any) {
-  return Array.isArray(achievements)
-    ? achievements
-      .map((achievement: string) => achievement?.trim()) // Trim whitespace from each achievement
-      .filter((achievement: string) => achievement && achievement.length > 0) // Remove empty or falsy values
-    : [];
-}
-
-
-export async function updateResume(resumeId: string, updatedData: any) {
-  if (!updatedData || !resumeId) {
-    return { message: "not found" }
+function cleanString(value: any): string | "" {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : "";
   }
+  return "";
+}
+
+function cleanArray(arr: any[] | null): any[] {
+  if (!Array.isArray(arr)) return [];
+  return arr.filter((item) => item != null && item !== "");
+}
+
+function cleanObject(obj: any): any {
+  if (Array.isArray(obj)) {
+    return cleanArray(obj);
+  } else if (typeof obj === "object" && obj !== null) {
+    const cleanedObject: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        // Clean each key-value pair in the object
+        cleanedObject[key] = cleanData(obj[key]);
+      }
+    }
+    return cleanedObject;
+  }
+  return obj;
+}
+
+function cleanData(data: any): any {
+  if (Array.isArray(data)) {
+    return data.map((item) => cleanObject(item));
+  }
+  if (typeof data === "object" && data !== null) {
+    return cleanObject(data);
+  }
+  return cleanString(data);
+}
+
+export async function updateResume(resumeId: string, updatedDatas: any) {
+  if (!updatedDatas || !resumeId) {
+    return { message: "not found" };
+  }
+
+  const cleanedData = cleanData(updatedDatas);
 
   try {
     const session = await getServerSession(auth);
-
     if (!session || !session.user?.email) {
       return { message: "unauthorized" };
     }
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
+      where: { email: session.user.email },
     });
-
     if (!user) {
       return { message: "user not found" };
     }
 
     const resume = await prisma.resume.findUnique({
-      where: {
-        id: resumeId,
-        userId: user.id,
-      },
-      include: {
-        content: true, // Include the related Content
+      where: { id: resumeId, userId: user.id },
+      include: { 
+        content: true,
       },
     });
-
     if (!resume) {
       return { message: "resume not found" };
     }
 
-    const cleanedSkills = cleanSkills(updatedData.skills);
-    const cleanedAchievments = cleanAchievements(updatedData.achievements)
-
     // Update the Resume and its nested Content
     await prisma.resume.update({
-      where: {
-        id: resume.id,
-      },
+      where: { id: resume.id },
       data: {
         content: {
           update: {
-            where: {
-              id: resume.content[0].id, // Assuming there's only one Content per Resume
-            },
+            where: { id: resume.content[0].id },
             data: {
-              name: updatedData.name || resume.content[0].name,
-              title: updatedData.title || resume.content[0].title,
-              summary: updatedData.summary || resume.content[0].summary,
-              lang: cleanedSkills[0] && cleanedSkills[0].items || resume.content[0].lang,
-              feSkills: cleanedSkills[1] && cleanedSkills[1].items || resume.content[0].feSkills,
-              beSkills: cleanedSkills[2] && cleanedSkills[2].items || resume.content[0].beSkills,
-              db: cleanedSkills[3] && cleanedSkills[3].items || resume.content[0].db,
-              apiDev: cleanedSkills[4] && cleanedSkills[4].items || resume.content[0].apiDev,
-              versionCon: cleanedSkills[5] && cleanedSkills[5].items || resume.content[0].versionCon,
-              contact: updatedData.contact
+              name: cleanedData.name || resume.content[0].name,
+              title: cleanedData.title || resume.content[0].title,
+              summary: cleanedData.summary || resume.content[0].summary,
+              skills: cleanedData.skills
                 ? {
-                  updateMany: updatedData.contact.map((contact: any) => ({
+                  updateMany: cleanedData.skills.map((skill: any) => ({
+                    where: { id: skill.id },
+                    data: {
+                      category: skill.category,
+                      items: skill.items,
+                    },
+                  })),
+                }
+                : undefined,
+              contact: cleanedData.contact
+                ? {
+                  updateMany: cleanedData.contact.map((contact: any) => ({
                     where: { id: contact.id },
                     data: {
                       email: contact.email,
@@ -94,9 +108,9 @@ export async function updateResume(resumeId: string, updatedData: any) {
                   })),
                 }
                 : undefined,
-              experince: updatedData.experince
+              experince: cleanedData.experince
                 ? {
-                  updateMany: updatedData.experince.map((exp: any) => ({
+                  updateMany: cleanedData.experince.map((exp: any) => ({
                     where: { id: exp.id },
                     data: {
                       company: exp.company,
@@ -107,9 +121,9 @@ export async function updateResume(resumeId: string, updatedData: any) {
                   })),
                 }
                 : undefined,
-              education: updatedData.education
+              education: cleanedData.education
                 ? {
-                  updateMany: updatedData.education.map((edu: any) => ({
+                  updateMany: cleanedData.education.map((edu: any) => ({
                     where: { id: edu.id },
                     data: {
                       school: edu.school,
@@ -119,9 +133,9 @@ export async function updateResume(resumeId: string, updatedData: any) {
                   })),
                 }
                 : undefined,
-              projects: updatedData.projects
+              projects: cleanedData.projects
                 ? {
-                  updateMany: updatedData.projects.map((proj: any) => ({
+                  updateMany: cleanedData.projects.map((proj: any) => ({
                     where: { id: proj.id },
                     data: {
                       name: proj.name,
@@ -131,18 +145,19 @@ export async function updateResume(resumeId: string, updatedData: any) {
                   })),
                 }
                 : undefined,
-              achievements: cleanedAchievments || resume.content[0].achievements,
-              certificate: updatedData.certificate ? {
-                updateMany: updatedData.certificate.map((cer: any) => ({
-                  where: {
-                    id: cer.id,
-                  },
-                  data: {
-                    name: cer.name,
-                    date: cer.date,
-                  }
-                }))
-              } : undefined
+              achievements:
+                cleanedData.achievements || resume.content[0].achievements,
+              certificate: cleanedData.certificate
+                ? {
+                  updateMany: cleanedData.certificate.map((cer: any) => ({
+                    where: { id: cer.id },
+                    data: {
+                      name: cer.name,
+                      date: cer.date,
+                    },
+                  })),
+                }
+                : undefined,
             },
           },
         },
@@ -151,6 +166,6 @@ export async function updateResume(resumeId: string, updatedData: any) {
 
     return { message: "Resume updated successfully" };
   } catch (error) {
-    return { message: "error", error }
+    return { message: "error", error };
   }
 }

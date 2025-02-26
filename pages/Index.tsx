@@ -52,6 +52,11 @@ interface Contact {
   github: string;
 }
 
+interface Skills {
+  category: string,
+  items: string[],
+}
+
 interface Content {
   name: string;
   title: string;
@@ -59,12 +64,7 @@ interface Content {
   summary: string;
   experience: Experience[];
   education: Education[];
-  feSkills: string[];
-  beSkills: string[];
-  db: string[];
-  lang: string[];
-  apiDev: string[];
-  versionCon: string[];
+  skills: Skills[];
   projects: Project[];
   jobPostDetails: string;
   achievements: string[];
@@ -94,16 +94,11 @@ const Index = () => {
       summary: "",
       experience: [],
       education: [],
-      feSkills: [],
-      beSkills: [],
-      db: [],
-      apiDev: [],
-      lang: [],
-      versionCon: [],
       projects: [],
       jobPostDetails: "",
       achievements: [],
       certificates: [],
+      skills: [{ category: "", items: [""] }]
     }
   });
 
@@ -139,16 +134,6 @@ const Index = () => {
           toast({
             title: "Required Fields Missing",
             description: "Please fill in your name and email address.",
-            variant: "destructive",
-          });
-          return false;
-        }
-        break;
-      case 2:
-        if (!formData.content.contact.email) {
-          toast({
-            title: "Required Fields Missing",
-            description: "Please provide your contact information.",
             variant: "destructive",
           });
           return false;
@@ -226,43 +211,42 @@ const Index = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(step)) return;
-    setLoading(true)
+    setLoading(true);
     toast({
       title: "Processing your resume",
       description: "We're generating your professional resume...",
     });
 
-    let aiRes;
-    try {
-      aiRes = await aiResponse(formData)
-    } catch (error) {
-      setLoading(false)
+
+    const aiRes = await aiResponse(formData);
+
+    if (aiRes.message === "Failed to process data.") {
+      setLoading(false); // Handle loading state on error
       toast({
         title: "Something went wrong",
-        description: "Some error occured while creating resume",
+        description: "Some error occurred while creating resume",
       });
       return;
     }
     try {
-      const res = await createResume(aiRes)
+      const res = await createResume(aiRes);
       if (res.message === "resume created successfully") {
         toast({
           title: "Resume processed",
           description: "Redirecting, to the preview page",
         });
-        setLoading(false)
-        router.push(`/preview/${res.resume?.id}`)
-        localStorage.clear()
+        setLoading(false);
+        router.push(`/preview/${res.resume?.id}`);
+        localStorage.clear();
       }
     } catch (error) {
+      setLoading(false); // Handle loading state on error
       toast({
         title: "Something went wrong",
-        description: "Some error occured while creating resume",
+        description: "Some error occurred while creating resume",
       });
-      setLoading(false)
       return;
     }
-
   };
 
   const renderStep = () => {
@@ -510,58 +494,57 @@ const Index = () => {
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
-              <Label htmlFor="lang">Programming Languages</Label>
-              <Input
-                id="lang"
-                placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
-                value={formData.content.lang.join(",")}
-                onChange={(e) => updateFormData("lang", e.target.value.split(","))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="feSkills">Frontend Skills</Label>
-              <Input
-                id="feSkills"
-                placeholder="HTML, CSS, React.js, Next.js, Redux, Recoil..."
-                value={formData.content.feSkills.join(",")}
-                onChange={(e) => updateFormData("feSkills", e.target.value.split(","))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="beSkills">Backend Skills</Label>
-              <Input
-                id="beSkills"
-                placeholder="Nodejs, Express.js, JWT, OAuth, NextAuth..."
-                value={formData.content.beSkills.join("\n")}
-                onChange={(e) => updateFormData("beSkills", e.target.value.split("\n"))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="db">Database</Label>
-              <Input
-                id="db"
-                placeholder="PostgreSQL, MongoDB, Redis...."
-                value={formData.content.db.join(",")}
-                onChange={(e) => updateFormData("db", e.target.value.split(","))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apiDev">Api Development</Label>
-              <Input
-                id="apiDev"
-                placeholder="RESTful APIs, WebSockets..."
-                value={formData.content.apiDev.join(",")}
-                onChange={(e) => updateFormData("apiDev", e.target.value.split(","))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="versionCon">Version Control</Label>
-              <Input
-                id="versionCon"
-                placeholder="git, github, monorepos(turborepo)..."
-                value={formData.content.versionCon.join(",")}
-                onChange={(e) => updateFormData("versionCon", e.target.value.split(","))}
-              />
+              <Label htmlFor="skills">Skills</Label>
+              {formData?.content?.skills?.map((skill, index) => (
+                <div key={index} className="space-y-2 p-4 border rounded-lg">
+                  <Input
+                    placeholder="eg: Frontend Skills"
+                    value={skill.category}
+                    onChange={(e) => {
+                      const newSkills = formData.content.skills.map((skill, i) =>
+                        i === index ? { ...skill, category: e.target.value } : skill
+                      );
+                      updateFormData("skills", newSkills);
+                    }}
+                  />
+                  <Input
+                    placeholder="eg: HTML, CSS, JS, REACT,JS...."
+                    value={skill.items.join(",")}
+                    onChange={(e) => {
+                      const newSkills = formData.content.skills.map((skill, i) =>
+                        i === index ? { ...skill, items: e.target.value.split(",").map(item => item.trim()) } : skill
+                      );
+                      updateFormData("skills", newSkills);
+                    }}
+                  />
+                </div>
+              ))}
+              <div className="w-full flex justify-between items-center flex-row-reverse">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const newSkills = [...formData.content.skills, { category: "", items: [""] }];
+                    updateFormData("skills", newSkills);
+                  }}
+                >
+                  Add Skills
+                </Button>
+
+                {formData.content.skills.length > 0 &&
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      if (formData.content.skills.length > 0) {
+                        const newSkills = formData.content.skills.slice(0, -1)
+                        updateFormData("skills", newSkills);
+                      }
+                    }}
+                  >
+                    Remove
+                  </Button>}
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="projects">Projects</Label>
@@ -671,16 +654,29 @@ const Index = () => {
                   />
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  const newCertificates = [...formData.content.certificates, { name: "", date: "" }];
-                  updateFormData("certificates", newCertificates);
-                }}
-              >
-                Add Certificate
-              </Button>
+              <div className="w-full flex flex-row-reverse justify-between items-center">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const newCertificates = [...formData.content.certificates, { name: "", date: "" }];
+                    updateFormData("certificates", newCertificates);
+                  }}
+                >
+                  Add Certificate
+                </Button>
+                {formData.content.certificates.length > 0 &&
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => {
+                      const newCertificates = formData.content.certificates.slice(0, -1)
+                      updateFormData("certificates", newCertificates);
+                    }}
+                  >
+                    Remove
+                  </Button>}
+              </div>
             </div>
           </div>
         );
