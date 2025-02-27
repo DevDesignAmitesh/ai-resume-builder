@@ -44,7 +44,7 @@ const Dashboard = ({ content }: { content: any }) => {
       setFeedback("");
     } else {
       toast({
-        title: "Something went wrong",
+        title: res.message,
         variant: "destructive"
       });
       setLoading(false)
