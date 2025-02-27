@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { auth, rateLimit } from "@/lib/auth";
 import { prisma } from "@/prisma/src";
 import { getServerSession } from "next-auth";
 
@@ -23,8 +23,22 @@ export async function addFeedback(content: string) {
     }
   })
 
+
   if (!user) {
     return { message: "user not found" }
+  }
+
+  const rateLimitCount = 1;
+  const rateLimitInterval = 60 * 1000 * 5;
+
+  const isAllowed = rateLimit(
+    user.email,
+    rateLimitCount,
+    rateLimitInterval
+  );
+
+  if (!isAllowed) {
+    return {message: "try after 5 minutes"};
   }
 
   const feedback = await prisma.feedback.create({
