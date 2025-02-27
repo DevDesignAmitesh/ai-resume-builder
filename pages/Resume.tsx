@@ -79,7 +79,7 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
 
         <div className={`flex w-full ${isEditing && "pt-6"} items-center lg:items-start justify-center lg:flex-row flex-col gap-8`}>
           {/* Left Section: Template Selection */}
-          <div className="no-print w-full flex flex-col gap-4 lg:w-1/3">
+          {/* <div className="no-print w-full flex flex-col gap-4 lg:w-1/3">
             {templates.map((template) => (
               <TemplateCard
                 key={template.template}
@@ -89,11 +89,11 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
                 template={template.template}
               />
             ))}
-          </div>
+          </div> */}
 
           {/* Right Section: Resume Display */}
-          <div className="print flex justify-center items-center w-full xl:w-2/3">
-            {selectedTemplate === "first" ? (
+          <div className="print flex justify-center items-center w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-2/3 mx-auto">
+            {/* {selectedTemplate === "first" ? (
               <ResumeTemplateOne isEditing={isEditing} setData={setData} resume={resume} />
             ) : (
               selectedTemplate === "second" ? (
@@ -106,7 +106,9 @@ const Resume = ({ resume, isEditing, resumeId }: { resume: any, isEditing: boole
                   <div className="flex justify-center items-center">
                     <p className="mt-20">Looking for another template...</p>
                   </div>
-            )}
+            )} */}
+
+            <ResumeTemplateOne isEditing={isEditing} setData={setData} resume={resume} />
           </div>
         </div>
       </div>

@@ -14,7 +14,9 @@ function cleanString(value: any): string | "" {
 
 function cleanArray(arr: any[] | null): any[] {
   if (!Array.isArray(arr)) return [];
-  return arr.filter((item) => item != null && item !== "");
+  return arr
+    .map((item) => (typeof item === "string" ? cleanString(item) : cleanObject(item))) // Recursively clean objects inside the array
+    .filter((item) => item !== ""); // Remove empty strings
 }
 
 function cleanObject(obj: any): any {
@@ -24,8 +26,7 @@ function cleanObject(obj: any): any {
     const cleanedObject: any = {};
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        // Clean each key-value pair in the object
-        cleanedObject[key] = cleanData(obj[key]);
+        cleanedObject[key] = cleanData(obj[key]); // Recursively clean all properties
       }
     }
     return cleanedObject;
@@ -35,7 +36,7 @@ function cleanObject(obj: any): any {
 
 function cleanData(data: any): any {
   if (Array.isArray(data)) {
-    return data.map((item) => cleanObject(item));
+    return cleanArray(data);
   }
   if (typeof data === "object" && data !== null) {
     return cleanObject(data);
@@ -43,12 +44,18 @@ function cleanData(data: any): any {
   return cleanString(data);
 }
 
+
 export async function updateResume(resumeId: string, updatedDatas: any) {
   if (!updatedDatas || !resumeId) {
     return { message: "not found" };
   }
 
+  console.log(updatedDatas)
+  console.log("-------------------------------------------------------------------------------")
+
   const cleanedData = cleanData(updatedDatas);
+
+  console.log(cleanedData);
 
   try {
     const session = await getServerSession(auth);
@@ -65,7 +72,7 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
 
     const resume = await prisma.resume.findUnique({
       where: { id: resumeId, userId: user.id },
-      include: { 
+      include: {
         content: true,
       },
     });
@@ -81,9 +88,9 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
           update: {
             where: { id: resume.content[0].id },
             data: {
-              name: cleanedData.name || resume.content[0].name,
-              title: cleanedData.title || resume.content[0].title,
-              summary: cleanedData.summary || resume.content[0].summary,
+              name: cleanedData.name || "",
+              title: cleanedData.title || "",
+              summary: cleanedData.summary || "",
               skills: cleanedData.skills
                 ? {
                   updateMany: cleanedData.skills.map((skill: any) => ({
@@ -108,9 +115,9 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
                   })),
                 }
                 : undefined,
-              experince: cleanedData.experince
+              experince: cleanedData.experience
                 ? {
-                  updateMany: cleanedData.experince.map((exp: any) => ({
+                  updateMany: cleanedData.experience.map((exp: any) => ({
                     where: { id: exp.id },
                     data: {
                       company: exp.company,
@@ -146,10 +153,10 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
                 }
                 : undefined,
               achievements:
-                cleanedData.achievements || resume.content[0].achievements,
-              certificate: cleanedData.certificate
+                cleanedData.achievements,
+              certificate: cleanedData.certifications
                 ? {
-                  updateMany: cleanedData.certificate.map((cer: any) => ({
+                  updateMany: cleanedData.certifications.map((cer: any) => ({
                     where: { id: cer.id },
                     data: {
                       name: cer.name,

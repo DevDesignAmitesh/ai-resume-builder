@@ -378,72 +378,7 @@ const ResumeTemplateTwo = ({ resume, isEditing, setData }: { resume: Resume, isE
         </>
       )}
 
-      {/* Achievements Section */}
-      <>
-        <section className="space-y-2">
-          {isEditing ? (
-            <>
-              <h3 className="text-xl font-semibold">Achievements</h3>
-              <textarea
-                className="text-gray-700 w-full"
-                value={(formData.achievements || []).join("\n")}
-                onChange={(e) => {
-                  const lines = e.target.value.split("\n").map(line => line.trim()).filter(line => line.length > 0);
-                  handleInputChange("achievements", lines);
-                }}
-                placeholder="Achievements (one per line)"
-                rows={5} // Optional: Ensure enough visible rows for multiline input
-              />
-            </>
-          ) : (
-            formData.achievements && formData.achievements.length > 0 &&
-            <>
-              <h3 className="text-xl font-semibold">Achievements</h3>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
-                {(formData.achievements || []).map((achievement, i) => (
-                  <li key={i}>{achievement}</li>
-                ))}
-              </ul>
-            </>
-          )}
-        </section>
-        <hr />
-      </>
-
-      {/* Certifications Section */}
-      {formData.certifications && formData.certifications.length > 0 && (
-        <>
-          <section className="space-y-2">
-            <h3 className="text-xl font-semibold">Certifications</h3>
-            {formData.certifications.map((cert, index) => (
-              <div key={index} className="flex w-full justify-between items-start">
-                {isEditing ? (
-                  <>
-                    <input
-                      className="font-medium text-gray-900 w-full"
-                      value={cert.name || ""}
-                      onChange={(e) => handleInputChange("certifications", e.target.value, index, "name")}
-                      placeholder="Certification Name"
-                    />
-                    <input
-                      className="text-sm text-gray-600"
-                      value={cert.date || ""}
-                      onChange={(e) => handleInputChange("certifications", e.target.value, index, "date")}
-                      placeholder="Date"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <h4 className="font-medium text-gray-900">{cert.name}</h4>
-                    <span className="text-sm text-gray-600">{cert.date}</span>
-                  </>
-                )}
-              </div>
-            ))}
-          </section>
-          <hr />
-        </>
-      )}
+      
 
       {/* Education Section */}
       {formData.education && formData.education.length > 0 && (

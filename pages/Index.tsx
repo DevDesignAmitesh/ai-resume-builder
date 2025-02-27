@@ -19,6 +19,7 @@ import { User, Briefcase, GraduationCap, List, Phone, FileText, Linkedin, Github
 import { createResume } from "@/app/api/actions/createResume";
 import { useRouter } from "next/navigation";
 import { aiResponse } from "@/lib/ai";
+import Optional from "@/components/Optional";
 
 interface Experience {
   company: string;
@@ -93,8 +94,8 @@ const Index = () => {
       },
       summary: "",
       experience: [],
-      education: [],
-      projects: [],
+      education: [{ school: "", degree: "", duration: "" }],
+      projects: [{ name: "", description: "", tech: [""], liveLink: "" }],
       jobPostDetails: "",
       achievements: [],
       certificates: [],
@@ -139,6 +140,7 @@ const Index = () => {
           return false;
         }
         break;
+
       case 4:
         if (!formData.content.summary || !formData.content.title) {
           toast({
@@ -149,9 +151,10 @@ const Index = () => {
           return false;
         }
         break;
+
       case 5:
         if (formData.content.education.length > 0) {
-          if (!formData.content.education[0].school || !formData.content.education[0].degree) {
+          if (!formData.content.education[0].school || !formData.content.education[0].degree || !formData.content.education[0].duration) {
             toast({
               title: "Required Fields Missing",
               description: "Please provide your educational background.",
@@ -159,35 +162,60 @@ const Index = () => {
             });
             return false;
           }
-          break;
         }
+        break; // Make sure to break out here after validation
+
       case 6:
         if (formData.content.experience.length > 0) {
-          if (!formData.content.experience[0].company || !formData.content.experience[0].description || !formData.content.experience[0].duration || !formData.content.experience[0].position) {
-            toast({
-              title: "Required Fields Missing",
-              description: "Please provide your experience.",
-              variant: "destructive",
-            });
-            return false;
+          for (const exp of formData.content.experience) {
+            if (!exp.company || !exp.position || !exp.duration || !exp.description.some(desc => desc.trim())) {
+              toast({
+                title: "Required Fields Missing",
+                description: "Please ensure all experience entries are complete.",
+                variant: "destructive",
+              });
+              return false;
+            }
           }
-          break;
         }
+        break; // Add break here
+
       case 7:
-        if (formData.content.projects.length > 0) {
-          if (!formData.content.projects[0].description || !formData.content.projects[0].name || !formData.content.projects[0].tech) {
-            toast({
-              title: "Required Fields Missing",
-              description: "Please provide your projects details.",
-              variant: "destructive",
-            });
-            return false;
+        // Validate skills
+        if (formData.content.skills.length > 0) {
+          for (const skill of formData.content.skills) {
+            if (!skill.category || !skill.items.some(item => item.trim())) {
+              toast({
+                title: "Required Fields Missing",
+                description: "Please ensure all skill categories and items are complete.",
+                variant: "destructive",
+              });
+              return false;
+            }
           }
-          break;
         }
+        // Validate projects
+        if (formData.content.projects.length > 0) {
+          for (const project of formData.content.projects) {
+            if (!project.name.trim() || !project.description.trim() || !project.tech.some(t => t.trim()) || !project.liveLink) {
+              toast({
+                title: "Required Fields Missing",
+                description: "Please ensure all project details are complete.",
+                variant: "destructive",
+              });
+              return false;
+            }
+          }
+        }
+        break;
+
+      default:
+        return true;
     }
+
     return true;
   };
+
 
   const handleNext = () => {
     if (!validateStep(step)) return;
@@ -280,7 +308,7 @@ const Index = () => {
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
               <Label htmlFor="github" className="flex items-center gap-2">
-                <Github className="h-4 w-4" /> GitHub Profile
+                <Github className="h-4 w-4" /> GitHub Profile <Optional />
               </Label>
               <Input
                 id="github"
@@ -291,7 +319,7 @@ const Index = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="linkedin" className="flex items-center gap-2">
-                <Linkedin className="h-4 w-4" /> LinkedIn Profile
+                <Linkedin className="h-4 w-4" /> LinkedIn Profile <Optional />
               </Label>
               <Input
                 id="linkedin"
@@ -302,7 +330,7 @@ const Index = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone" className="flex items-center gap-2">
-                <Phone className="h-4 w-4" /> Phone Number
+                <Phone className="h-4 w-4" /> Phone Number <Optional />
               </Label>
               <Input
                 id="phone"
@@ -317,10 +345,10 @@ const Index = () => {
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
-              <Label htmlFor="jobPostDetails">Job Post Details</Label>
+              <Label htmlFor="jobPostDetails">Job Post Details <Optional /> </Label>
               <Textarea
                 id="jobPostDetails"
-                placeholder="Paste the job post details here (optional)"
+                placeholder="Paste the job post details here"
                 className="h-32"
                 value={formData.content.jobPostDetails}
                 onChange={(e) => updateFormData("jobPostDetails", e.target.value)}
@@ -360,7 +388,7 @@ const Index = () => {
               {formData.content.education.map((edu, index) => (
                 <div key={index} className="space-y-2 w-full p-4 border rounded-lg">
                   <Input
-                    placeholder="School name"
+                    placeholder="Institute name"
                     value={edu.school}
                     onChange={(e) => {
                       const newEducation = [...formData.content.education];
@@ -369,7 +397,7 @@ const Index = () => {
                     }}
                   />
                   <Input
-                    placeholder="Degree"
+                    placeholder="Degree ( B.Com or 12th standard )"
                     value={edu.degree}
                     onChange={(e) => {
                       const newEducation = [...formData.content.education];
@@ -378,7 +406,7 @@ const Index = () => {
                     }}
                   />
                   <Input
-                    placeholder="Duration"
+                    placeholder="Duration ( 2023-2026 )"
                     value={edu.duration}
                     onChange={(e) => {
                       const newEducation = [...formData.content.education];
@@ -421,7 +449,7 @@ const Index = () => {
         return (
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
-              <Label htmlFor="experience">Work Experience</Label>
+              <Label htmlFor="experience">Work Experience <Optional /></Label>
               {formData.content.experience.map((exp, index) => (
                 <div key={index} className="space-y-2 p-4 border rounded-lg">
                   <Input
@@ -443,7 +471,7 @@ const Index = () => {
                     }}
                   />
                   <Input
-                    placeholder="Duration"
+                    placeholder="Duration ( 2023 - 2026 )"
                     value={exp.duration}
                     onChange={(e) => {
                       const newExperience = [...formData.content.experience];
@@ -452,7 +480,7 @@ const Index = () => {
                     }}
                   />
                   <Textarea
-                    placeholder="Description (one per line)"
+                    placeholder="Your job Description"
                     value={exp.description.join("\n")}
                     onChange={(e) => {
                       const newExperience = [...formData.content.experience];
@@ -478,7 +506,7 @@ const Index = () => {
                     type="button"
                     variant="destructive"
                     onClick={() => {
-                      if (formData.content.experience.length >= 0) {
+                      if (formData.content.experience.length > 0) {
                         const newExperience = formData.content.experience.slice(0, -1)
                         updateFormData("experience", newExperience);
                       }
@@ -509,10 +537,12 @@ const Index = () => {
                   />
                   <Input
                     placeholder="eg: HTML, CSS, JS, REACT,JS...."
-                    value={skill.items.join(",")}
+                    value={skill.items.join(", ")} // This will show the skills as a simple string
                     onChange={(e) => {
                       const newSkills = formData.content.skills.map((skill, i) =>
-                        i === index ? { ...skill, items: e.target.value.split(",").map(item => item.trim()) } : skill
+                        i === index
+                          ? { ...skill, items: [e.target.value] } // Store as a single string
+                          : skill
                       );
                       updateFormData("skills", newSkills);
                     }}
@@ -524,26 +554,27 @@ const Index = () => {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    const newSkills = [...formData.content.skills, { category: "", items: [""] }];
+                    const newSkills = [...formData.content.skills, { category: "", items: [] }];
                     updateFormData("skills", newSkills);
                   }}
                 >
                   Add Skills
                 </Button>
 
-                {formData.content.skills.length > 0 &&
+                {formData.content.skills.length > 0 && (
                   <Button
                     type="button"
                     variant="destructive"
                     onClick={() => {
                       if (formData.content.skills.length > 0) {
-                        const newSkills = formData.content.skills.slice(0, -1)
+                        const newSkills = formData.content.skills.slice(0, -1);
                         updateFormData("skills", newSkills);
                       }
                     }}
                   >
                     Remove
-                  </Button>}
+                  </Button>
+                )}
               </div>
             </div>
             <div className="space-y-2">
@@ -569,11 +600,11 @@ const Index = () => {
                     }}
                   />
                   <Input
-                    placeholder="Technologies used (comma-separated)"
-                    value={project.tech.join(", ")}
+                    placeholder="Technologies used"
+                    value={project.tech.join(" ")} // join the technologies with space for display
                     onChange={(e) => {
                       const newProjects = [...formData.content.projects];
-                      newProjects[index].tech = e.target.value.split(", ").map(t => t.trim());
+                      newProjects[index].tech = e.target.value.split(" "); // split based on spaces to form the array
                       updateFormData("projects", newProjects);
                     }}
                   />
@@ -600,19 +631,20 @@ const Index = () => {
                   Add Project
                 </Button>
 
-                {formData.content.projects.length > 0 &&
+                {formData.content.projects.length > 0 && (
                   <Button
                     type="button"
                     variant="destructive"
                     onClick={() => {
                       if (formData.content.projects.length > 0) {
-                        const newProjects = formData.content.projects.slice(0, -1)
+                        const newProjects = formData.content.projects.slice(0, -1);
                         updateFormData("projects", newProjects);
                       }
                     }}
                   >
                     Remove
-                  </Button>}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -624,7 +656,7 @@ const Index = () => {
               <Label htmlFor="achievements">Achievements</Label>
               <Textarea
                 id="achievements"
-                placeholder="List your achievements (one per line)"
+                placeholder="List your achievements"
                 className="h-32"
                 value={formData.content.achievements.join("\n")}
                 onChange={(e) => updateFormData("achievements", e.target.value.split("\n"))}
