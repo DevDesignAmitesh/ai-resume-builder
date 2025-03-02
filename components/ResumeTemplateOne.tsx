@@ -425,24 +425,24 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
                 return validProjects.length > 0 ? (
                   <>
                     {validProjects.map((project, index) => (
-                      <div key={index} className="space-y-2">
+                      <div key={index} className="">
                         <li>
-                          <ul className="font-medium text-gray-900 inline-block ml-[-8px]">
+                          <ul className="font-medium mb-1 text-gray-900 inline-block ml-[-8px]">
                             {project.name}
                           </ul>
                         </li>
-                        <p className="text-gray-700">{project.description}</p>
+                        <p className="text-gray-700 mb-2">{project.description}</p>
                         {project.liveLink && (
                           <Link
                             href={project.liveLink}
                             target="_blank"
-                            className="font-medium mb-1 text-gray-900"
+                            className="font-medium text-gray-900"
                           >
                             Live Demo: <span className="underline">{project.name}</span>
                           </Link>
                         )}
                         {project.tech && project.tech.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap mt-2 gap-2">
                             {project.tech.map((tech, i) => (
                               <Badge key={i} variant="outline" className="text-xs text-gray-600">
                                 {tech}

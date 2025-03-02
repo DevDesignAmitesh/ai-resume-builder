@@ -3,72 +3,60 @@
 import Navbar from "@/components/Navbar";
 import Templates from "@/components/Templates";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowRight, FileText, PenLine, Download, Check, ChevronDown } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  ArrowRight,
+  FileText,
+  PenLine,
+  Download,
+  Check,
+  ChevronDown,
+} from "lucide-react";
 import { Sparkles } from "lucide-react";
-import { signIn } from "next-auth/react"
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 
-
-const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
+const Home = ({ session, feedbacks }: { session: string; feedbacks: any }) => {
   const router = useRouter();
   const feedback = Array.isArray(feedbacks) ? feedbacks.flat() : [];
 
   const handleStart = () => {
-    signIn("google", { callbackUrl: "/dashboard" })
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const handlePush = () => {
-    router.push("/dashboard")
-  }
+    router.push("/dashboard");
+  };
 
   const steps = [
     {
       icon: <PenLine className="h-6 w-6" />,
       title: "Fill Details",
-      description: "Input your information with AI-powered assistance"
+      description: "Input your information with AI-powered assistance",
     },
     {
       icon: <FileText className="h-6 w-6" />,
       title: "Choose Template",
-      description: "Select from our professionally designed resume templates"
+      description: "Select from our professionally designed resume templates",
     },
     {
       icon: <Download className="h-6 w-6" />,
       title: "Download",
-      description: "Export your resume in multiple formats"
-    }
+      description: "Export your resume in multiple formats",
+    },
   ];
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Software Engineer",
-      content: "This AI resume builder helped me land my dream job. The templates are modern and professional.",
-      company: "Tech Corp"
-    },
-    {
-      name: "Michael Chen",
-      role: "Product Manager",
-      content: "Incredibly intuitive interface. Created a stunning resume in minutes!",
-      company: "StartupX"
-    },
-    {
-      name: "Emma Williams",
-      role: "Marketing Director",
-      content: "The AI suggestions were spot-on. Highly recommend for any professional.",
-      company: "Growth Co"
-    }
-  ];
+  const images = ["/ss1.png", "/ss2.png", "/ss3.png", "/ss4.png"];
 
   return (
     <div className="min-h-screen relative w-full flex flex-col items-center justify-center bg-background text-foreground">
       <Navbar />
       {/* Hero Section */}
       <div
-        style={{ backgroundImage: 'url(/bg-1.svg)' }}
-        className="w-full relative bg-cover bg-[50%_20%] h-screen bg-blue-900 flex justify-center items-center animate-fadeIn">
+        style={{ backgroundImage: "url(/bg-1.svg)" }}
+        className="w-full relative bg-cover bg-[50%_20%] h-screen bg-blue-900 flex justify-center items-center animate-fadeIn"
+      >
         <div className="p-8 text-center w-full space-y-6">
           <div className="space-y-2 w-full">
             <h1 className="text-6xl font-bold w-full">
@@ -85,8 +73,12 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
               onClick={!session ? handleStart : handlePush}
               className="group text-lg px-8 w-full md:w-72 py-2 h-auto"
             >
-              <span className="capitalize">{!session ? "Sign in to generate" : "Get started"}</span>
-              {!session && <FcGoogle className="ml-2 group-hover:rotate-12 transition-transform" />}
+              <span className="capitalize">
+                {!session ? "Sign in to generate" : "Get started"}
+              </span>
+              {!session && (
+                <FcGoogle className="ml-2 group-hover:rotate-12 transition-transform" />
+              )}
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -109,7 +101,6 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
             <ChevronDown className="h-6 w-6 text-white" />
           </div>
         </div>
-
       </div>
 
       {/* Templates Section */}
@@ -118,12 +109,13 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
       {/* How it Works Section */}
       <section className="py-24 px-4 w-full bg-secondary/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            How It Works
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
-              <div key={index} className="flex flex-col items-center text-center space-y-4 relative">
+              <div
+                key={index}
+                className="flex flex-col items-center text-center space-y-4 relative"
+              >
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                   {step.icon}
                 </div>
@@ -143,12 +135,8 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-12">See How It Works</h2>
           <Card className="aspect-video relative group cursor-pointer">
-            <div className="absolute inset-0 flex items-center justify-center">
-            </div>
-            <video
-              controls
-              className="w-full h-full object-cover rounded-lg"
-            >
+            <div className="absolute inset-0 flex items-center justify-center"></div>
+            <video controls className="w-full h-full object-cover rounded-lg">
               <source
                 src={`${process.env.NEXT_PUBLIC_BASE_URL}/videos/resume.mp4`}
                 type="video/mp4"
@@ -159,18 +147,18 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-4 w-full bg-secondary/50">
+      <section className="py-20 px-4 flex flex-col justify-between items-center gap-10 w-full bg-secondary/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-3xl font-bold text-center mb-8">
             What Our Users Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {feedback?.map((feed: any, index: any) => (
+            {feedback?.map((feed: any, index: number) => (
               <Card key={index} className="p-6">
                 <div className="flex flex-col gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Check className="h-5 w-5 text-primary" />
+                    <div className="h-10 w-10 overflow-hidden rounded-full bg-primary/10 flex items-center justify-center">
+                      <img src={feed.User.image} alt="" className="h-full w-full" />
                     </div>
                     <div>
                       <p className="font-semibold">{feed.User.fullName}</p>
@@ -181,6 +169,27 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
                   </div>
                   <p className="text-muted-foreground">{feed.content}</p>
                 </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Twitter Testimonials */}
+        <div className="max-w-6xl w-full mx-auto mt-12">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            What Our Twitter Folks Say
+          </h2>
+          <div className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {images.map((src, index) => (
+              <Card
+                key={index}
+                className="w-full h-60 flex items-center justify-center overflow-hidden"
+              >
+                <img
+                  src={src}
+                  alt={`Image ${index + 1}`}
+                  className="w-72 h-52 object-contain"
+                />
               </Card>
             ))}
           </div>
@@ -199,8 +208,12 @@ const Home = ({ session, feedbacks }: { session: string, feedbacks: any }) => {
               onClick={!session ? handleStart : handlePush}
               className="group text-lg px-8 w-full md:w-72 py-2 h-auto"
             >
-              <span className="capitalize">{!session ? "Get started now" : "start generating"}</span>
-              {!session && <FcGoogle className="ml-2 group-hover:rotate-12 transition-transform" />}
+              <span className="capitalize">
+                {!session ? "Get started now" : "start generating"}
+              </span>
+              {!session && (
+                <FcGoogle className="ml-2 group-hover:rotate-12 transition-transform" />
+              )}
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
