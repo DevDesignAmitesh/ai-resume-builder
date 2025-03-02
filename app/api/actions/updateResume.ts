@@ -50,12 +50,8 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
     return { message: "not found" };
   }
 
-  console.log(updatedDatas)
-  console.log("-------------------------------------------------------------------------------")
-
   const cleanedData = cleanData(updatedDatas);
 
-  console.log(cleanedData);
 
   try {
     const session = await getServerSession(auth);

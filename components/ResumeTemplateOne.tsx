@@ -52,11 +52,24 @@ interface Resume {
   }[];
 }
 
-const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isEditing: boolean, setData: any }) => {
+const ResumeTemplateOne = ({
+  resume,
+  isEditing,
+  setData,
+}: {
+  resume: Resume;
+  isEditing: boolean;
+  setData: any;
+}) => {
   const data = resume?.content?.[0];
 
-  if (!data) return <p className="text-center text-muted-foreground">No resume data available</p>;
-  console.log(data)
+  if (!data)
+    return (
+      <p className="text-center text-muted-foreground">
+        No resume data available
+      </p>
+    );
+  console.log(data);
   // Initialize formData with the modified skills structure
   const [formData, setFormData] = useState({
     name: data.name || "",
@@ -71,8 +84,12 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
     certifications: data.certificate || [],
   });
 
-
-  const handleInputChange = (field: string, value: any, index?: number, subField?: string) => {
+  const handleInputChange = (
+    field: string,
+    value: any,
+    index?: number,
+    subField?: string
+  ) => {
     setFormData((prev: any) => {
       if (index !== undefined && subField) {
         const updatedArray = [...prev[field as keyof typeof prev]];
@@ -112,7 +129,6 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
 
       return { ...prev, [field]: value };
     });
-
   };
 
   useEffect(() => {
@@ -151,39 +167,79 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
                 <input
                   className="text-sm w-full text-gray-700"
                   value={formData.contact[0].email}
-                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "email")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "contact",
+                      e.target.value,
+                      undefined,
+                      "email"
+                    )
+                  }
                   placeholder="Email"
                 />
                 <input
                   className="text-sm w-full text-gray-700"
                   value={formData.contact[0].phone}
-                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "phone")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "contact",
+                      e.target.value,
+                      undefined,
+                      "phone"
+                    )
+                  }
                   placeholder="Phone"
                 />
                 <input
                   className="text-sm w-full underline text-gray-700"
                   value={formData.contact[0].linkedin}
-                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "linkedin")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "contact",
+                      e.target.value,
+                      undefined,
+                      "linkedin"
+                    )
+                  }
                   placeholder="LinkedIn URL"
                 />
                 <input
                   className="text-sm w-full underline text-gray-700"
                   value={formData.contact[0].github}
-                  onChange={(e) => handleInputChange("contact", e.target.value, undefined, "github")}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "contact",
+                      e.target.value,
+                      undefined,
+                      "github"
+                    )
+                  }
                   placeholder="GitHub URL"
                 />
               </>
             ) : (
               <>
-                {formData.contact[0].email && <span>{formData.contact[0].email}</span>}
-                {formData.contact[0].phone && <span>{formData.contact[0].phone}</span>}
+                {formData.contact[0].email && (
+                  <span>{formData.contact[0].email}</span>
+                )}
+                {formData.contact[0].phone && (
+                  <span>{formData.contact[0].phone}</span>
+                )}
                 {formData.contact[0].linkedin && (
-                  <Link href={formData.contact[0].linkedin} className="text-blue-600 hover:underline" target="_blank">
+                  <Link
+                    href={formData.contact[0].linkedin}
+                    className="text-blue-600 hover:underline"
+                    target="_blank"
+                  >
                     LinkedIn
                   </Link>
                 )}
                 {formData.contact[0].github && (
-                  <Link href={formData.contact[0].github} className="text-blue-600 hover:underline" target="_blank">
+                  <Link
+                    href={formData.contact[0].github}
+                    className="text-blue-600 hover:underline"
+                    target="_blank"
+                  >
                     GitHub
                   </Link>
                 )}
@@ -197,7 +253,9 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
       {/* Summary Section */}
       <>
         <section className="space-y-1">
-          {formData.summary && !isEditing && <h3 className="text-xl font-semibold">Professional Summary</h3>}
+          {formData.summary && !isEditing && (
+            <h3 className="text-xl font-semibold">Professional Summary</h3>
+          )}
           {isEditing ? (
             <>
               <h3 className="text-xl font-semibold">Professional Summary</h3>
@@ -209,10 +267,14 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
               <hr />
             </>
           ) : (
-            formData.summary && <>
-              <p className="text-gray-800 leading-[1.5]">{formData.summary}</p>
-              <hr />
-            </>
+            formData.summary && (
+              <>
+                <p className="text-gray-800 leading-[1.5]">
+                  {formData.summary}
+                </p>
+                <hr />
+              </>
+            )
           )}
         </section>
       </>
@@ -225,28 +287,40 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
             <>
               <h3 className="text-xl font-semibold">Skills</h3>
               <div>
-                {formData.skills.map((skillCategory, index) => (
-                  skillCategory.category && (
-                    <div key={index} className="mb-4">
-                      <label className="block text-sm font-semibold mb-2">
-                        {skillCategory.category}
-                      </label>
-                      <input
-                        type="text"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={skillCategory.items.join(", ")}
-                        onChange={(e) => {
-                          const updatedSkills = [...formData.skills];
-                          updatedSkills[index].items = e.target.value
-                            .split(",")
-                            .map((item) => item.trim());
-                          handleInputChange("skills", updatedSkills);
-                        }}
-                        placeholder={`Skills for ${skillCategory.category} (comma-separated)`}
-                      />
-                    </div>
-                  )
-                ))}
+                {formData.skills.map(
+                  (skillCategory, index) =>
+                    skillCategory.category && (
+                      <div key={index} className="mb-4">
+                        {/* Editable Category Name */}
+                        <input
+                          type="text"
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline font-semibold"
+                          value={skillCategory.category}
+                          onChange={(e) => {
+                            const updatedSkills = [...formData.skills];
+                            updatedSkills[index].category = e.target.value;
+                            handleInputChange("skills", updatedSkills);
+                          }}
+                          placeholder="Category Name"
+                        />
+
+                        {/* Editable Skills List */}
+                        <input
+                          type="text"
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2"
+                          value={skillCategory.items.join(", ")}
+                          onChange={(e) => {
+                            const updatedSkills = [...formData.skills];
+                            updatedSkills[index].items = e.target.value
+                              .split(",")
+                              .map((item) => item.trim());
+                            handleInputChange("skills", updatedSkills);
+                          }}
+                          placeholder={`Skills for ${skillCategory.category} (comma-separated)`}
+                        />
+                      </div>
+                    )
+                )}
               </div>
               <hr />
             </>
@@ -255,7 +329,8 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
             (() => {
               // Filter out categories with empty `items`
               const visibleSkills = formData.skills.filter(
-                (skillCategory) => skillCategory.category && skillCategory.items.length > 0
+                (skillCategory) =>
+                  skillCategory.category && skillCategory.items.length > 0
               );
 
               return visibleSkills.length > 0 ? (
@@ -263,15 +338,24 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
                   <h3 className="text-xl font-semibold mb-1">Skills</h3>
                   <div className="w-full mb-3">
                     {visibleSkills.map((skillCategory, index) => (
-                      <div key={index} className="flex justify-center items-center w-full">
-                        <ul className="list-disc pl-5 w-[50%] min-w-fit">
-                          <li className="font-semibold">{skillCategory.category}</li>
+                      <div
+                        key={index}
+                        className="flex justify-center items-start w-full"
+                      >
+                        <ul className="list-disc flex flex-col justify-start items-start pl-5 w-[50%] min-w-fit">
+                          <li className="font-semibold">
+                            {skillCategory.category}
+                          </li>
                         </ul>
-                        <div className="w-full flex flex-wrap gap-2">
+                        <div className="w-full flex flex-wrap gap-1">
                           {skillCategory.items.map((skill, skillIndex) => (
-                            <span key={skillIndex} className="text-sm">
+                            <span
+                              key={skillIndex}
+                              className="text-sm leading-tight"
+                            >
                               {skill}
-                              {skillIndex !== skillCategory.items.length - 1 && ","}
+                              {skillIndex !== skillCategory.items.length - 1 &&
+                                ","}
                             </span>
                           ))}
                         </div>
@@ -286,90 +370,110 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
         </section>
       )}
 
-
       {/* Experience Section */}
       {formData.experience && formData.experience.length > 0 && (
         <section className="space-y-3">
           <h3 className="text-xl font-semibold">Experience</h3>
 
-          {isEditing ? (
-            // Editing Mode - Show All Experiences
-            formData.experience.map((exp, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between w-full items-start">
-                  <div>
+          {isEditing
+            ? // Editing Mode - Show All Experiences
+              formData.experience.map((exp, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between w-full items-start">
+                    <div>
+                      <input
+                        className="font-medium text-gray-900 w-full"
+                        value={exp.position}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "experience",
+                            e.target.value,
+                            index,
+                            "position"
+                          )
+                        }
+                        placeholder="Position"
+                      />
+                      <input
+                        className="text-gray-600 w-full"
+                        value={exp.company}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "experience",
+                            e.target.value,
+                            index,
+                            "company"
+                          )
+                        }
+                        placeholder="Company"
+                      />
+                    </div>
                     <input
-                      className="font-medium text-gray-900 w-full"
-                      value={exp.position}
+                      className="text-sm text-gray-600"
+                      value={exp.duration}
                       onChange={(e) =>
-                        handleInputChange("experience", e.target.value, index, "position")
+                        handleInputChange(
+                          "experience",
+                          e.target.value,
+                          index,
+                          "duration"
+                        )
                       }
-                      placeholder="Position"
-                    />
-                    <input
-                      className="text-gray-600 w-full"
-                      value={exp.company}
-                      onChange={(e) =>
-                        handleInputChange("experience", e.target.value, index, "company")
-                      }
-                      placeholder="Company"
+                      placeholder="Duration"
                     />
                   </div>
-                  <input
-                    className="text-sm text-gray-600"
-                    value={exp.duration}
+                  <textarea
+                    className="text-gray-700 w-full"
+                    value={exp.description.join("\n")}
                     onChange={(e) =>
-                      handleInputChange("experience", e.target.value, index, "duration")
+                      handleInputChange(
+                        "experience",
+                        e.target.value.split("\n"),
+                        index,
+                        "description"
+                      )
                     }
-                    placeholder="Duration"
+                    placeholder="Description (one per line)"
                   />
+                  <hr />
                 </div>
-                <textarea
-                  className="text-gray-700 w-full"
-                  value={exp.description.join("\n")}
-                  onChange={(e) =>
-                    handleInputChange("experience", e.target.value.split("\n"), index, "description")
-                  }
-                  placeholder="Description (one per line)"
-                />
-                <hr />
-              </div>
-            ))
-          ) : (
-            // Non-Editing Mode - Filter Empty Entries
-            (() => {
-              const validExperiences = formData.experience.filter(
-                (exp) => exp.position && exp.company
-              );
+              ))
+            : // Non-Editing Mode - Filter Empty Entries
+              (() => {
+                const validExperiences = formData.experience.filter(
+                  (exp) => exp.position && exp.company
+                );
 
-              return validExperiences.length > 0 ? (
-                <>
-                  {validExperiences.map((exp, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between w-full items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{exp.position}</h4>
-                          <p className="text-gray-600">{exp.company}</p>
+                return validExperiences.length > 0 ? (
+                  <>
+                    {validExperiences.map((exp, index) => (
+                      <div key={index} className="space-y-2">
+                        <div className="flex justify-between w-full items-start">
+                          <div>
+                            <h4 className="font-medium text-gray-900">
+                              {exp.position}
+                            </h4>
+                            <p className="text-gray-600">{exp.company}</p>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {exp.duration}
+                          </span>
                         </div>
-                        <span className="text-sm text-gray-600">{exp.duration}</span>
+                        {exp.description.length > 0 && (
+                          <ul className="list-disc list-inside text-gray-700 space-y-1">
+                            {exp.description.map((desc, i) => (
+                              <li key={i}>{desc}</li>
+                            ))}
+                          </ul>
+                        )}
+                        <hr />
                       </div>
-                      {exp.description.length > 0 && (
-                        <ul className="list-disc list-inside text-gray-700 space-y-1">
-                          {exp.description.map((desc, i) => (
-                            <li key={i}>{desc}</li>
-                          ))}
-                        </ul>
-                      )}
-                      <hr />
-                    </div>
-                  ))}
-                </>
-              ) : null;
-            })()
-          )}
+                    ))}
+                  </>
+                ) : null;
+              })()}
         </section>
       )}
-
 
       {/* Projects Section */}
       {formData.projects && formData.projects.length > 0 && (
@@ -377,90 +481,114 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
           <section className="space-y-2">
             <h3 className="text-xl font-semibold">Projects</h3>
 
-            {isEditing ? (
-              // Editing Mode - Show All Projects
-              formData.projects.map((project, index) => (
-                <div key={index} className="space-y-2">
-                  <input
-                    className="font-medium text-gray-900 w-full"
-                    value={project.name}
-                    onChange={(e) =>
-                      handleInputChange("projects", e.target.value, index, "name")
-                    }
-                    placeholder="Project Name"
-                  />
-                  <textarea
-                    className="text-gray-700 w-full"
-                    value={project.description}
-                    onChange={(e) =>
-                      handleInputChange("projects", e.target.value, index, "description")
-                    }
-                    placeholder="Description"
-                  />
-                  <input
-                    className="font-medium text-gray-900 w-full"
-                    value={project.liveLink}
-                    onChange={(e) =>
-                      handleInputChange("projects", e.target.value, index, "liveLink")
-                    }
-                    placeholder="Project's Live Link"
-                  />
-                  <input
-                    className="text-xs text-gray-600 w-full"
-                    value={project.tech.join(", ")}
-                    onChange={(e) =>
-                      handleInputChange("projects", e.target.value.split(", "), index, "tech")
-                    }
-                    placeholder="Technologies (comma-separated)"
-                  />
-                </div>
-              ))
-            ) : (
-              // Non-Editing Mode - Filter Empty Projects
-              (() => {
-                const validProjects = formData.projects.filter(
-                  (project) => project.name && project.description
-                );
+            {isEditing
+              ? // Editing Mode - Show All Projects
+                formData.projects.map((project, index) => (
+                  <div key={index} className="space-y-2">
+                    <input
+                      className="font-medium text-gray-900 w-full"
+                      value={project.name}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "projects",
+                          e.target.value,
+                          index,
+                          "name"
+                        )
+                      }
+                      placeholder="Project Name"
+                    />
+                    <textarea
+                      className="text-gray-700 w-full"
+                      value={project.description}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "projects",
+                          e.target.value,
+                          index,
+                          "description"
+                        )
+                      }
+                      placeholder="Description"
+                    />
+                    <input
+                      className="font-medium text-gray-900 w-full"
+                      value={project.liveLink}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "projects",
+                          e.target.value,
+                          index,
+                          "liveLink"
+                        )
+                      }
+                      placeholder="Project's Live Link"
+                    />
+                    <input
+                      className="text-xs text-gray-600 w-full"
+                      value={project.tech.join(", ")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "projects",
+                          e.target.value.split(", "),
+                          index,
+                          "tech"
+                        )
+                      }
+                      placeholder="Technologies (comma-separated)"
+                    />
+                  </div>
+                ))
+              : // Non-Editing Mode - Filter Empty Projects
+                (() => {
+                  const validProjects = formData.projects.filter(
+                    (project) => project.name && project.description
+                  );
 
-                return validProjects.length > 0 ? (
-                  <>
-                    {validProjects.map((project, index) => (
-                      <div key={index} className="">
-                        <li>
-                          <ul className="font-medium mb-1 text-gray-900 inline-block ml-[-8px]">
-                            {project.name}
-                          </ul>
-                        </li>
-                        <p className="text-gray-700 mb-2">{project.description}</p>
-                        {project.liveLink && (
-                          <Link
-                            href={project.liveLink}
-                            target="_blank"
-                            className="font-medium text-gray-900"
-                          >
-                            Live Demo: <span className="underline">{project.name}</span>
-                          </Link>
-                        )}
-                        {project.tech && project.tech.length > 0 && (
-                          <div className="flex flex-wrap mt-2 gap-2">
-                            {project.tech.map((tech, i) => (
-                              <Badge key={i} variant="outline" className="text-xs text-gray-600">
-                                {tech}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </>
-                ) : null;
-              })()
-            )}
+                  return validProjects.length > 0 ? (
+                    <>
+                      {validProjects.map((project, index) => (
+                        <div key={index} className="">
+                          <li>
+                            <ul className="font-medium mb-1 text-gray-900 inline-block ml-[-8px]">
+                              {project.name}
+                            </ul>
+                          </li>
+                          <p className="text-gray-700 mb-2">
+                            {project.description}
+                          </p>
+                          {project.liveLink && (
+                            <Link
+                              href={project.liveLink}
+                              target="_blank"
+                              className="font-medium text-gray-900"
+                            >
+                              Live Demo:{" "}
+                              <span className="underline">{project.name}</span>
+                            </Link>
+                          )}
+                          {project.tech && project.tech.length > 0 && (
+                            <div className="flex flex-wrap mt-2 gap-2">
+                              {project.tech.map((tech, i) => (
+                                <Badge
+                                  key={i}
+                                  variant="outline"
+                                  className="text-xs text-gray-600"
+                                >
+                                  {tech}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </>
+                  ) : null;
+                })()}
           </section>
           <hr />
         </>
       )}
-
 
       {/* Achievements Section */}
       <>
@@ -505,7 +633,6 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
         </section>
       </>
 
-
       {/* Certifications Section */}
       {formData.certifications && formData.certifications.length > 0 && (
         <section className="space-y-2 w-full">
@@ -515,17 +642,34 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
               <h3 className="text-xl font-semibold">Certifications</h3>
               <div>
                 {formData.certifications.map((cert, index) => (
-                  <div key={index} className="flex w-full justify-between items-start">
+                  <div
+                    key={index}
+                    className="flex w-full justify-between items-start"
+                  >
                     <input
                       className="font-medium text-gray-900 w-full"
                       value={cert.name || ""}
-                      onChange={(e) => handleInputChange("certifications", e.target.value, index, "name")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "certifications",
+                          e.target.value,
+                          index,
+                          "name"
+                        )
+                      }
                       placeholder="Certification Name"
                     />
                     <input
                       className="text-sm text-gray-600"
                       value={cert.date || ""}
-                      onChange={(e) => handleInputChange("certifications", e.target.value, index, "date")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "certifications",
+                          e.target.value,
+                          index,
+                          "date"
+                        )
+                      }
                       placeholder="Date"
                     />
                   </div>
@@ -546,9 +690,16 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
                   <h3 className="text-xl font-semibold mb-1">Certifications</h3>
                   <div className="w-full mb-3">
                     {visibleCertifications.map((cert, index) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <h4 className="font-medium text-gray-900">{cert.name}</h4>
-                        <span className="text-sm text-gray-600">{cert.date}</span>
+                      <div
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <h4 className="font-medium text-gray-900">
+                          {cert.name}
+                        </h4>
+                        <span className="text-sm text-gray-600">
+                          {cert.date}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -560,74 +711,94 @@ const ResumeTemplateOne = ({ resume, isEditing, setData }: { resume: Resume, isE
         </section>
       )}
 
-
-
       {/* Education Section */}
       {formData.education && formData.education.length > 0 && (
         <>
           <section className="space-y-2">
             <h3 className="text-xl font-semibold">Education</h3>
 
-            {isEditing ? (
-              // Editing Mode - Show All Fields
-              formData.education.map((edu, index) => (
-                <div key={index} className="flex w-full justify-between items-start">
-                  <div className="w-full">
+            {isEditing
+              ? // Editing Mode - Show All Fields
+                formData.education.map((edu, index) => (
+                  <div
+                    key={index}
+                    className="flex w-full justify-between items-start"
+                  >
+                    <div className="w-full">
+                      <input
+                        className="font-medium text-gray-900 w-full"
+                        value={edu.school}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "education",
+                            e.target.value,
+                            index,
+                            "school"
+                          )
+                        }
+                        placeholder="School"
+                      />
+                      <input
+                        className="text-gray-600 w-full"
+                        value={edu.degree}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "education",
+                            e.target.value,
+                            index,
+                            "degree"
+                          )
+                        }
+                        placeholder="Degree"
+                      />
+                    </div>
                     <input
-                      className="font-medium text-gray-900 w-full"
-                      value={edu.school}
+                      className="text-sm text-gray-600 w-[120px]"
+                      value={edu.duration}
                       onChange={(e) =>
-                        handleInputChange("education", e.target.value, index, "school")
+                        handleInputChange(
+                          "education",
+                          e.target.value,
+                          index,
+                          "duration"
+                        )
                       }
-                      placeholder="School"
-                    />
-                    <input
-                      className="text-gray-600 w-full"
-                      value={edu.degree}
-                      onChange={(e) =>
-                        handleInputChange("education", e.target.value, index, "degree")
-                      }
-                      placeholder="Degree"
+                      placeholder="Duration"
                     />
                   </div>
-                  <input
-                    className="text-sm text-gray-600 w-[120px]"
-                    value={edu.duration}
-                    onChange={(e) =>
-                      handleInputChange("education", e.target.value, index, "duration")
-                    }
-                    placeholder="Duration"
-                  />
-                </div>
-              ))
-            ) : (
-              // Non-Editing Mode - Filter Empty Entries
-              (() => {
-                const validEducation = formData.education.filter(
-                  (edu) => edu.school && edu.degree
-                );
+                ))
+              : // Non-Editing Mode - Filter Empty Entries
+                (() => {
+                  const validEducation = formData.education.filter(
+                    (edu) => edu.school && edu.degree
+                  );
 
-                return validEducation.length > 0 ? (
-                  <>
-                    {validEducation.map((edu, index) => (
-                      <div key={index} className="flex w-full justify-between items-start">
-                        <div>
-                          <h4 className="font-medium text-gray-900">{edu.school}</h4>
-                          <p className="text-gray-600">{edu.degree}</p>
+                  return validEducation.length > 0 ? (
+                    <>
+                      {validEducation.map((edu, index) => (
+                        <div
+                          key={index}
+                          className="flex w-full justify-between items-start"
+                        >
+                          <div>
+                            <h4 className="font-medium text-gray-900">
+                              {edu.school}
+                            </h4>
+                            <p className="text-gray-600">{edu.degree}</p>
+                          </div>
+                          {edu.duration && (
+                            <span className="text-sm text-gray-600">
+                              {edu.duration}
+                            </span>
+                          )}
                         </div>
-                        {edu.duration && (
-                          <span className="text-sm text-gray-600">{edu.duration}</span>
-                        )}
-                      </div>
-                    ))}
-                  </>
-                ) : null;
-              })()
-            )}
+                      ))}
+                    </>
+                  ) : null;
+                })()}
           </section>
         </>
       )}
-
     </div>
   );
 };
