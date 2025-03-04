@@ -3,10 +3,23 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, FileText, MessageSquare, Trash, Pencil, Send } from "lucide-react";
+import {
+  Eye,
+  FileText,
+  MessageSquare,
+  Trash,
+  Pencil,
+  Send,
+} from "lucide-react";
 import Link from "next/link";
 import Templates from "@/components/Templates";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,7 +29,7 @@ import { addFeedback } from "@/app/api/actions/addFeedback";
 
 const Dashboard = ({ content }: { content: any }) => {
   const [feedback, setFeedback] = useState("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -29,32 +42,33 @@ const Dashboard = ({ content }: { content: any }) => {
 
   const handleFeedbackSubmit = async () => {
     if (!feedback) {
-      alert("Provide Some Feedback")
-      return
+      alert("Provide Some Feedback");
+      return;
     }
-    setLoading(true)
-    const res = await addFeedback(feedback)
+    setLoading(true);
+    const res = await addFeedback(feedback);
 
     if (res.message === "feedback added") {
       toast({
         title: "Thank you for your feedback!",
-        description: "We appreciate your input and will use it to improve our service.",
+        description:
+          "We appreciate your input and will use it to improve our service.",
       });
-      setLoading(false)
+      setLoading(false);
       setFeedback("");
     } else {
       toast({
         title: res.message,
-        variant: "destructive"
+        variant: "destructive",
       });
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-start p-8 bg-background">
       {/* Feedback Button (Top-Right Corner) */}
-      <div className="absolute top-8 right-8">
+      <div className="absolute flex flex-row-reverse gap-2 items-center justify-center top-8 right-8">
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" className="gap-2">
@@ -74,7 +88,11 @@ const Dashboard = ({ content }: { content: any }) => {
                 className="min-h-[150px]"
               />
               <div className="flex justify-end">
-                <Button disabled={loading} onClick={handleFeedbackSubmit} className="gap-2">
+                <Button
+                  disabled={loading}
+                  onClick={handleFeedbackSubmit}
+                  className="gap-2"
+                >
                   <Send className="w-4 h-4" />
                   {loading ? "Sending Feedback" : "Send Feedback"}
                 </Button>
@@ -82,6 +100,14 @@ const Dashboard = ({ content }: { content: any }) => {
             </div>
           </DialogContent>
         </Dialog>
+        <Button
+          onClick={() => {
+            router.push("/");
+          }}
+          variant={"default"}
+        >
+          Home
+        </Button>
       </div>
 
       {/* Main Content Section */}
@@ -89,7 +115,9 @@ const Dashboard = ({ content }: { content: any }) => {
         {/* Header Section */}
         <header className="text-left mb-12">
           <h1 className="text-4xl font-bold mb-2">My Resumes</h1>
-          <p className="text-muted-foreground">Create, manage, and track your resumes</p>
+          <p className="text-muted-foreground">
+            Create, manage, and track your resumes
+          </p>
         </header>
         {/* Create New Resume Card */}
         <Link href="/generate">
@@ -98,15 +126,15 @@ const Dashboard = ({ content }: { content: any }) => {
               <FileText className="w-12 h-12 text-primary" />
               <h2 className="text-2xl font-semibold">Create New Resume</h2>
               <p className="text-muted-foreground text-center">
-                Start building your professional resume with our AI-powered tools
+                Start building your professional resume with our AI-powered
+                tools
               </p>
             </div>
           </Card>
         </Link>
 
         {/* Recent Resumes Section */}
-        {
-          safeContent.length > 0 &&
+        {safeContent.length > 0 && (
           <section className="w-full">
             <h2 className="text-2xl font-semibold mb-4">Recent Resumes</h2>
             <div className="flex flex-col justify-center items-center gap-4 w-full">
@@ -119,7 +147,9 @@ const Dashboard = ({ content }: { content: any }) => {
                     <FileText className="w-6 h-6 text-primary" />
                     <div className="flex-1">
                       <h3 className="font-medium truncate">{resume.title}</h3>
-                      <p className="text-sm text-muted-foreground">{resume.lastModified}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {resume.lastModified}
+                      </p>
                     </div>
                   </div>
                   {/* Action Buttons */}
@@ -137,7 +167,10 @@ const Dashboard = ({ content }: { content: any }) => {
                     </Link>
 
                     {/* Delete Button */}
-                    <button onClick={() => handleDelete(resume.resumeId)} className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    <button
+                      onClick={() => handleDelete(resume.resumeId)}
+                      className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    >
                       <Trash className="w-5 h-5" />
                     </button>
                   </div>
@@ -145,10 +178,7 @@ const Dashboard = ({ content }: { content: any }) => {
               ))}
             </div>
           </section>
-        }
-
-        {/* Templates Section (unchanged) */}
-        <Templates isTextCenter={false} />
+        )}
       </main>
 
       {/* Toast Notifications */}

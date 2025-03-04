@@ -3,6 +3,9 @@
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { Plus, Trash } from "lucide-react";
+import { deleteSkills } from "@/app/api/actions/deleteSkills";
 
 interface Resume {
   content: {
@@ -11,16 +14,11 @@ interface Resume {
     name: string;
     title: string;
     summary: string;
-    feSkills: string[];
-    beSkills: string[];
-    db: string[];
-    lang: string[];
-    apiDev: string[];
-    versionCon: string[];
     skills: {
+      id: string;
       category: string;
       items: string[];
-    }[]; // Modified skills structure
+    }[];
     contact: {
       email: string;
       phone: string;
@@ -69,8 +67,7 @@ const ResumeTemplateOne = ({
         No resume data available
       </p>
     );
-  console.log(data);
-  // Initialize formData with the modified skills structure
+
   const [formData, setFormData] = useState({
     name: data.name || "",
     title: data.title || "",
@@ -135,13 +132,28 @@ const ResumeTemplateOne = ({
     setData(formData);
   }, [formData, setData]);
 
+  const addSkill = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      skills: [...prevData.skills, { id: "", category: "", items: [] }],
+    }));
+  };
+
+  const removeSkill = async (id: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      skills: prevData.skills.filter((name) => name.id !== id),
+    }));
+    await deleteSkills(id);
+  };
+
   return (
     <div className="w-full mx-auto bg-white text-black p-8 rounded-xl space-y-6">
       {/* Header Section */}
       <header className="text-center w-full space-y-2">
         {isEditing ? (
           <input
-            className="text-3xl font-bold w-full text-center"
+            className="text-3xl border border-black/50 p-2 rounded-sm font-bold w-full text-center"
             value={formData.name}
             placeholder="Your Name"
             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -151,7 +163,7 @@ const ResumeTemplateOne = ({
         )}
         {isEditing ? (
           <input
-            className="text-xl text-gray-600 w-full text-center"
+            className="text-xl text-gray-600 w-full p-2 text-center border border-black/50 rounded-sm"
             value={formData.title}
             placeholder="Job Title"
             onChange={(e) => handleInputChange("title", e.target.value)}
@@ -165,7 +177,7 @@ const ResumeTemplateOne = ({
             {isEditing ? (
               <>
                 <input
-                  className="text-sm w-full text-gray-700"
+                  className="text-sm w-full border border-black/50 rounded-sm p-2 text-gray-700"
                   value={formData.contact[0].email}
                   onChange={(e) =>
                     handleInputChange(
@@ -178,7 +190,7 @@ const ResumeTemplateOne = ({
                   placeholder="Email"
                 />
                 <input
-                  className="text-sm w-full text-gray-700"
+                  className="text-sm w-full border border-black/50 rounded-sm p-2 text-gray-700"
                   value={formData.contact[0].phone}
                   onChange={(e) =>
                     handleInputChange(
@@ -191,7 +203,7 @@ const ResumeTemplateOne = ({
                   placeholder="Phone"
                 />
                 <input
-                  className="text-sm w-full underline text-gray-700"
+                  className="text-sm w-full border border-black/50 rounded-sm p-2 underline text-gray-700"
                   value={formData.contact[0].linkedin}
                   onChange={(e) =>
                     handleInputChange(
@@ -204,7 +216,7 @@ const ResumeTemplateOne = ({
                   placeholder="LinkedIn URL"
                 />
                 <input
-                  className="text-sm w-full underline text-gray-700"
+                  className="text-sm w-full border border-black/50 rounded-sm p-2 underline text-gray-700"
                   value={formData.contact[0].github}
                   onChange={(e) =>
                     handleInputChange(
@@ -260,7 +272,7 @@ const ResumeTemplateOne = ({
             <>
               <h3 className="text-xl font-semibold">Professional Summary</h3>
               <textarea
-                className="text-gray-800 leading-relaxed w-full"
+                className="text-gray-800 border p-2 border-black/80 rounded-sm leading-relaxed w-full"
                 value={formData.summary}
                 onChange={(e) => handleInputChange("summary", e.target.value)}
               />
@@ -281,46 +293,66 @@ const ResumeTemplateOne = ({
 
       {/* Skills Section */}
       {formData.skills && formData.skills.length > 0 && (
-        <section className="space-y-2">
+        <section className="space-y-2 w-full relative">
           {/* Editing Mode */}
           {isEditing ? (
             <>
-              <h3 className="text-xl font-semibold">Skills</h3>
-              <div>
-                {formData.skills.map(
-                  (skillCategory, index) =>
-                    skillCategory.category && (
-                      <div key={index} className="mb-4">
-                        {/* Editable Category Name */}
-                        <input
-                          type="text"
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline font-semibold"
-                          value={skillCategory.category}
-                          onChange={(e) => {
-                            const updatedSkills = [...formData.skills];
-                            updatedSkills[index].category = e.target.value;
-                            handleInputChange("skills", updatedSkills);
-                          }}
-                          placeholder="Category Name"
-                        />
+              <div className="flex w-full justify-between items-center">
+                <h3 className="text-xl mb-4 font-semibold">Skills</h3>
+                {/* <div className="absolute top-0 right-0 flex justify-center gap-2 items-center">
+                  <button
+                    className="bg-blue-600 flex justify-center items-center gap-1 py-1 px-3 rounded-md text-white"
+                    onClick={addSkill}
+                  >
+                    Add Skills <Plus />
+                  </button>
+                </div> */}
+              </div>
+              <div className="">
+                {formData.skills.map((skillCategory, index) => (
+                  <div
+                    key={index}
+                    className="mb-4 w-full flex flex-row-reverse justify-between items-start"
+                  >
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeSkill(skillCategory.id)}
+                      className="p-2 ml-5 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    >
+                      <Trash className="w-5 h-5" />
+                    </Button>
+                    {/* Editable Category Name */}
+                    <div className="w-full flex flex-col">
+                      <input
+                        type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline font-semibold"
+                        value={skillCategory.category}
+                        onChange={(e) => {
+                          const updatedSkills = [...formData.skills];
+                          updatedSkills[index].category = e.target.value;
+                          handleInputChange("skills", updatedSkills);
+                        }}
+                        placeholder="Category Name"
+                      />
 
-                        {/* Editable Skills List */}
-                        <input
-                          type="text"
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2"
-                          value={skillCategory.items.join(", ")}
-                          onChange={(e) => {
-                            const updatedSkills = [...formData.skills];
-                            updatedSkills[index].items = e.target.value
-                              .split(",")
-                              .map((item) => item.trim());
-                            handleInputChange("skills", updatedSkills);
-                          }}
-                          placeholder={`Skills for ${skillCategory.category} (comma-separated)`}
-                        />
-                      </div>
-                    )
-                )}
+                      {/* Editable Skills List */}
+                      <input
+                        type="text"
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mt-2"
+                        value={skillCategory.items.join(", ")}
+                        onChange={(e) => {
+                          const updatedSkills = [...formData.skills];
+                          updatedSkills[index].items = e.target.value
+                            .split(",")
+                            .map((item) => item.trim());
+                          handleInputChange("skills", updatedSkills);
+                        }}
+                        placeholder={`Skills for ${skillCategory.category} (comma-separated)`}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
               <hr />
             </>
@@ -382,7 +414,7 @@ const ResumeTemplateOne = ({
                   <div className="flex justify-between w-full items-start">
                     <div>
                       <input
-                        className="font-medium text-gray-900 w-full"
+                        className="font-medium border border-black/50 rounded-sm p-2 text-gray-900 w-full"
                         value={exp.position}
                         onChange={(e) =>
                           handleInputChange(
@@ -395,7 +427,7 @@ const ResumeTemplateOne = ({
                         placeholder="Position"
                       />
                       <input
-                        className="text-gray-600 w-full"
+                        className="text-gray-600 border border-black/50 rounded-sm p-2 w-full"
                         value={exp.company}
                         onChange={(e) =>
                           handleInputChange(
@@ -409,7 +441,7 @@ const ResumeTemplateOne = ({
                       />
                     </div>
                     <input
-                      className="text-sm text-gray-600"
+                      className="text-sm border border-black/50 rounded-sm p-2 text-gray-600"
                       value={exp.duration}
                       onChange={(e) =>
                         handleInputChange(
@@ -423,7 +455,7 @@ const ResumeTemplateOne = ({
                     />
                   </div>
                   <textarea
-                    className="text-gray-700 w-full"
+                    className="text-gray-700 border border-black/50 rounded-sm p-2 w-full"
                     value={exp.description.join("\n")}
                     onChange={(e) =>
                       handleInputChange(
@@ -486,7 +518,7 @@ const ResumeTemplateOne = ({
                 formData.projects.map((project, index) => (
                   <div key={index} className="space-y-2">
                     <input
-                      className="font-medium text-gray-900 w-full"
+                      className="font-medium border border-black/50 rounded-sm p-2 text-gray-900 w-full"
                       value={project.name}
                       onChange={(e) =>
                         handleInputChange(
@@ -499,7 +531,7 @@ const ResumeTemplateOne = ({
                       placeholder="Project Name"
                     />
                     <textarea
-                      className="text-gray-700 w-full"
+                      className="text-gray-700 border border-black/50 rounded-sm p-2 w-full"
                       value={project.description}
                       onChange={(e) =>
                         handleInputChange(
@@ -512,7 +544,7 @@ const ResumeTemplateOne = ({
                       placeholder="Description"
                     />
                     <input
-                      className="font-medium text-gray-900 w-full"
+                      className="font-medium border border-black/50 rounded-sm p-2 text-gray-900 w-full"
                       value={project.liveLink}
                       onChange={(e) =>
                         handleInputChange(
@@ -525,7 +557,7 @@ const ResumeTemplateOne = ({
                       placeholder="Project's Live Link"
                     />
                     <input
-                      className="text-xs text-gray-600 w-full"
+                      className="text-xs border border-black/50 rounded-sm p-2 text-gray-600 w-full"
                       value={project.tech.join(", ")}
                       onChange={(e) =>
                         handleInputChange(
@@ -597,7 +629,7 @@ const ResumeTemplateOne = ({
             <>
               <h3 className="text-xl font-semibold">Achievements</h3>
               <textarea
-                className="text-gray-700 w-full"
+                className="text-gray-700 border border-black/50 rounded-sm p-2 w-full"
                 value={(formData.achievements || []).join("\n")}
                 onChange={(e) => {
                   const lines = e.target.value
@@ -647,7 +679,7 @@ const ResumeTemplateOne = ({
                     className="flex w-full justify-between items-start"
                   >
                     <input
-                      className="font-medium text-gray-900 w-full"
+                      className="font-medium border border-black/50 rounded-sm p-2 text-gray-900 w-full"
                       value={cert.name || ""}
                       onChange={(e) =>
                         handleInputChange(
@@ -660,7 +692,7 @@ const ResumeTemplateOne = ({
                       placeholder="Certification Name"
                     />
                     <input
-                      className="text-sm text-gray-600"
+                      className="text-sm border border-black/50 rounded-sm p-2 text-gray-600"
                       value={cert.date || ""}
                       onChange={(e) =>
                         handleInputChange(
@@ -726,7 +758,7 @@ const ResumeTemplateOne = ({
                   >
                     <div className="w-full">
                       <input
-                        className="font-medium text-gray-900 w-full"
+                        className="font-medium border border-black/50 rounded-sm p-2 text-gray-900 w-full"
                         value={edu.school}
                         onChange={(e) =>
                           handleInputChange(
@@ -739,7 +771,7 @@ const ResumeTemplateOne = ({
                         placeholder="School"
                       />
                       <input
-                        className="text-gray-600 w-full"
+                        className="text-gray-600 border border-black/50 rounded-sm p-2 w-full"
                         value={edu.degree}
                         onChange={(e) =>
                           handleInputChange(
@@ -753,7 +785,7 @@ const ResumeTemplateOne = ({
                       />
                     </div>
                     <input
-                      className="text-sm text-gray-600 w-[120px]"
+                      className="text-sm text-gray-600 border border-black/50 rounded-sm p-2 w-[120px]"
                       value={edu.duration}
                       onChange={(e) =>
                         handleInputChange(

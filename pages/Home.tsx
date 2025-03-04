@@ -158,7 +158,11 @@ const Home = ({ session, feedbacks }: { session: string; feedbacks: any }) => {
                 <div className="flex flex-col gap-4">
                   <div className="flex items-start gap-4">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-primary/10 flex items-center justify-center">
-                      <img src={feed.User.image} alt="" className="h-full w-full" />
+                      <img
+                        src={feed.User.image}
+                        alt=""
+                        className="h-full w-full"
+                      />
                     </div>
                     <div>
                       <p className="font-semibold">{feed.User.fullName}</p>

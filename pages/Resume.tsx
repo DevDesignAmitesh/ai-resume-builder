@@ -29,10 +29,6 @@ const Resume = ({
       title: "Second Template",
       template: "second",
     },
-    {
-      title: "Third Template",
-      template: "third",
-    },
   ];
 
   const router = useRouter();
@@ -55,6 +51,7 @@ const Resume = ({
           title: "Changes Saved",
         });
         setLoading(false);
+        router.refresh();
         return;
       }
     } catch (error) {
@@ -104,7 +101,7 @@ const Resume = ({
           } items-center lg:items-start justify-center lg:flex-row flex-col gap-8`}
         >
           {/* Left Section: Template Selection */}
-          {/* <div className="no-print w-full flex flex-col gap-4 lg:w-1/3">
+          <div className="no-print w-full flex flex-col gap-4 lg:w-1/3">
             {templates.map((template) => (
               <TemplateCard
                 key={template.template}
@@ -114,11 +111,11 @@ const Resume = ({
                 template={template.template}
               />
             ))}
-          </div> */}
+          </div>
 
           {/* Right Section: Resume Display */}
           <div className="print flex justify-center items-center w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-2/3 mx-auto">
-            {/* {selectedTemplate === "first" ? (
+            {selectedTemplate === "first" ? (
               <ResumeTemplateOne
                 isEditing={isEditing}
                 setData={setData}
@@ -130,23 +127,17 @@ const Resume = ({
                 setData={setData}
                 resume={resume}
               />
-            ) : selectedTemplate === "third" ? (
-              <ResumeTemplateThree
-                isEditing={isEditing}
-                setData={setData}
-                resume={resume}
-              />
             ) : (
               <div className="flex justify-center items-center">
                 <p className="mt-20">Looking for another template...</p>
               </div>
-            )} */}
+            )}
 
-            <ResumeTemplateOne
+            {/* <ResumeTemplateOne
               isEditing={isEditing}
               setData={setData}
               resume={resume}
-            />
+            /> */}
           </div>
         </div>
       </div>

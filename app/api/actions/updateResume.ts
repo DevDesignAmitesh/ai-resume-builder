@@ -15,7 +15,9 @@ function cleanString(value: any): string | "" {
 function cleanArray(arr: any[] | null): any[] {
   if (!Array.isArray(arr)) return [];
   return arr
-    .map((item) => (typeof item === "string" ? cleanString(item) : cleanObject(item))) // Recursively clean objects inside the array
+    .map((item) =>
+      typeof item === "string" ? cleanString(item) : cleanObject(item)
+    ) // Recursively clean objects inside the array
     .filter((item) => item !== ""); // Remove empty strings
 }
 
@@ -44,14 +46,19 @@ function cleanData(data: any): any {
   return cleanString(data);
 }
 
-
 export async function updateResume(resumeId: string, updatedDatas: any) {
   if (!updatedDatas || !resumeId) {
     return { message: "not found" };
   }
 
+  console.log(updatedDatas.skills);
+  console.log(
+    "---------------------------------------------------------------------"
+  );
+
   const cleanedData = cleanData(updatedDatas);
 
+  console.log(cleanedData.skills);
 
   try {
     const session = await getServerSession(auth);
@@ -89,77 +96,76 @@ export async function updateResume(resumeId: string, updatedDatas: any) {
               summary: cleanedData.summary || "",
               skills: cleanedData.skills
                 ? {
-                  updateMany: cleanedData.skills.map((skill: any) => ({
-                    where: { id: skill.id },
-                    data: {
-                      category: skill.category,
-                      items: skill.items,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.skills.map((skill: any) => ({
+                      where: { id: skill.id },
+                      data: {
+                        category: skill.category,
+                        items: skill.items,
+                      },
+                    })),
+                  }
                 : undefined,
               contact: cleanedData.contact
                 ? {
-                  updateMany: cleanedData.contact.map((contact: any) => ({
-                    where: { id: contact.id },
-                    data: {
-                      email: contact.email,
-                      phone: contact.phone,
-                      linkedin: contact.linkedin,
-                      github: contact.github,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.contact.map((contact: any) => ({
+                      where: { id: contact.id },
+                      data: {
+                        email: contact.email,
+                        phone: contact.phone,
+                        linkedin: contact.linkedin,
+                        github: contact.github,
+                      },
+                    })),
+                  }
                 : undefined,
               experince: cleanedData.experience
                 ? {
-                  updateMany: cleanedData.experience.map((exp: any) => ({
-                    where: { id: exp.id },
-                    data: {
-                      company: exp.company,
-                      position: exp.position,
-                      duration: exp.duration,
-                      description: exp.description,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.experience.map((exp: any) => ({
+                      where: { id: exp.id },
+                      data: {
+                        company: exp.company,
+                        position: exp.position,
+                        duration: exp.duration,
+                        description: exp.description,
+                      },
+                    })),
+                  }
                 : undefined,
               education: cleanedData.education
                 ? {
-                  updateMany: cleanedData.education.map((edu: any) => ({
-                    where: { id: edu.id },
-                    data: {
-                      school: edu.school,
-                      degree: edu.degree,
-                      duration: edu.duration,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.education.map((edu: any) => ({
+                      where: { id: edu.id },
+                      data: {
+                        school: edu.school,
+                        degree: edu.degree,
+                        duration: edu.duration,
+                      },
+                    })),
+                  }
                 : undefined,
               projects: cleanedData.projects
                 ? {
-                  updateMany: cleanedData.projects.map((proj: any) => ({
-                    where: { id: proj.id },
-                    data: {
-                      name: proj.name,
-                      description: proj.description,
-                      tech: proj.tech,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.projects.map((proj: any) => ({
+                      where: { id: proj.id },
+                      data: {
+                        name: proj.name,
+                        description: proj.description,
+                        tech: proj.tech,
+                      },
+                    })),
+                  }
                 : undefined,
-              achievements:
-                cleanedData.achievements,
+              achievements: cleanedData.achievements,
               certificate: cleanedData.certifications
                 ? {
-                  updateMany: cleanedData.certifications.map((cer: any) => ({
-                    where: { id: cer.id },
-                    data: {
-                      name: cer.name,
-                      date: cer.date,
-                    },
-                  })),
-                }
+                    updateMany: cleanedData.certifications.map((cer: any) => ({
+                      where: { id: cer.id },
+                      data: {
+                        name: cer.name,
+                        date: cer.date,
+                      },
+                    })),
+                  }
                 : undefined,
             },
           },
