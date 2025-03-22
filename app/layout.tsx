@@ -1,5 +1,5 @@
 import "./globals.css";
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function RootLayout({
   children,
@@ -8,10 +8,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
-      <GoogleAnalytics gaId="G-0EZTGTDJ39" />
+      <head>
+        {/* PWA Metadata */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icons/icon-1.png" />
+        {/* Google Analytics */}
+        <GoogleAnalytics gaId="G-0EZTGTDJ39" />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }
